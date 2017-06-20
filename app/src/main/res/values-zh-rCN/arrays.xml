@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bug_types">
+        <item>意见和建议</item>
+        <item>通话和短信</item>
+        <item>相机和图库</item>
+        <item>网络问题</item>
+        <item>音视频播放</item>
+        <item>系统升级</item>
+        <item>其它应用</item>
+    </string-array>
+
+</resources>

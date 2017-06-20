@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_padding"
+    android:paddingRight="@dimen/activity_padding"
+    android:paddingBottom="@dimen/activity_padding"
+    android:scrollbars="none"
+    tools:context="com.coolyota.logreport.LogSettingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <Switch
+            android:id="@+id/switch_yota_log"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="yota Log"/>
+
+        <Button
+            android:id="@+id/btn_save_sdcard"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/save_sdcard_text"/>
+
+        <Button
+            android:id="@+id/btn_qxdm"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/qxdm_btn_text"/>
+
+        <RelativeLayout
+            android:id="@+id/line_modify_bug_type"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:background="@drawable/profile_item_bg_color_selector">
+
+            <TextView
+                style="@style/TextTitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/bug_type"/>
+
+            <Spinner
+                android:id="@+id/spinner_bug_type"
+                style="@style/TextContentAppearanceSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:entries="@array/bug_types"
+                android:gravity="center_vertical"/>
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/edit_bug_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@android:color/white"
+            android:gravity="top|start"
+            android:hint="@string/bug_details_sample"
+            android:inputType="textMultiLine"
+            android:minLines="5"/>
+
+        <TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:text="@string/upload_photo"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/parent_add_pic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="start|center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/parent_delete_pic"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:gravity="start|top"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/edit_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:background="@android:color/white"
+            android:gravity="start|center_vertical"
+            android:layout_marginTop="5dp"
+            android:hint="@string/phone_or_email"
+            android:inputType="text"/>
+
+        <CheckBox
+            android:id="@+id/check_delete_upload_files"
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="0dp"
+            android:checked="true"
+            android:visibility="visible"
+            android:text="@string/delete_after_file_upload"/>
+
+        <com.coolyota.logreport.ui.RotateInButton
+            android:id="@+id/button_submit"
+            style="@style/SubmitRotateInButtonCommonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            app:enabled="true"
+            app:text="@string/submit">
+        </com.coolyota.logreport.ui.RotateInButton>
+
+
+    </LinearLayout>
+
+</ScrollView>

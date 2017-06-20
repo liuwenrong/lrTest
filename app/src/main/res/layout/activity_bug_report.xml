@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/activity_padding"
+            android:scrollbars="none"
+            tools:context=".BugReportActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/line_modify_bug_type"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:background="@drawable/profile_item_bg_color_selector">
+
+            <TextView
+                style="@style/TextTitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/bug_type"/>
+
+            <Spinner
+                android:id="@+id/spinner_bug_type"
+                style="@style/TextContentAppearanceSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:entries="@array/bug_types"
+                android:gravity="center_vertical"/>
+        </RelativeLayout>
+
+        <!--<TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/bug_title"
+            android:visibility="gone"
+            android:textSize="16sp"/>-->
+
+<!--        <EditText
+            android:id="@+id/edit_bug_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:hint="@string/hint_title"
+            android:visibility="gone"
+            android:inputType="text"
+            android:maxLines="1"/>-->
+
+        <!--<TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="start|center_vertical"
+            android:visibility="gone"
+            android:text="@string/bug_desc"
+            android:textSize="16sp"/>-->
+
+        <EditText
+            android:id="@+id/edit_bug_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@android:color/white"
+            android:gravity="top|start"
+            android:hint="@string/bug_details_sample"
+            android:inputType="textMultiLine"
+            android:minLines="5"/>
+
+<!--        <CheckBox
+            android:id="@+id/check_must_happen"
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="0dp"
+            android:visibility="gone"
+            android:text="@string/must_happen"/>-->
+
+<!--        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/white"
+            android:gravity="start|center_vertical"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_bug_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/date"
+                android:inputType="date"/>
+
+            <EditText
+                android:id="@+id/edit_bug_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/happen_time"
+                android:inputType="time"/>
+
+            <View
+                android:id="@+id/focus_view"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+        </LinearLayout>-->
+
+        <TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:text="@string/upload_photo"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/parent_add_pic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="start|center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="5dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_add_selector"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/parent_delete_pic"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:gravity="start|top"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="60dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_delete_pic"
+                    android:visibility="invisible"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:text="@string/file"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_file_path"
+                style="@style/TextContentAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:hint="@string/selected_file"
+                android:layout_marginBottom="5dp"
+                android:minHeight="40dp"/>
+
+            <ImageButton
+                android:id="@+id/button_delete_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/text_file_path"
+                android:layout_alignTop="@+id/text_file_path"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@null"
+                android:src="@drawable/ic_delete_button_bg_selector"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
+        <!--<TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:text="@string/log_file"
+            android:visibility="gone"/>-->
+
+        <!--<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_log_record_path"
+                style="@style/TextContentAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:hint="@string/no_log_file"/>
+
+            <ImageButton
+                android:id="@+id/button_delete_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/text_log_record_path"
+                android:layout_alignTop="@+id/text_log_record_path"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@null"
+                android:src="@drawable/ic_delete_button_bg_selector"
+                android:visibility="gone"/>
+        </RelativeLayout>-->
+
+        <!--<TextView
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:text="@string/contacts_method"/>-->
+
+        <EditText
+            android:id="@+id/edit_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:background="@android:color/white"
+            android:gravity="start|center_vertical"
+            android:hint="@string/phone_or_email"
+            android:inputType="text"/>
+
+        <CheckBox
+            android:id="@+id/check_delete_upload_files"
+            style="@style/TextTitleStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_common_height"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="0dp"
+            android:checked="true"
+            android:visibility="gone"
+            android:text="@string/delete_after_file_upload"/>
+
+        <com.coolyota.logreport.ui.RotateInButton
+            android:id="@+id/button_submit"
+            style="@style/SubmitRotateInButtonCommonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            app:enabled="true"
+            app:text="@string/submit">
+        </com.coolyota.logreport.ui.RotateInButton>
+    </LinearLayout>
+</ScrollView>
