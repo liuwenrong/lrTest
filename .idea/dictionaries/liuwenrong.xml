@@ -4,6 +4,7 @@
       <w>batterystats</w>
       <w>betareport</w>
       <w>bugreport</w>
+      <w>cdma</w>
       <w>coolyota</w>
       <w>datacall</w>
       <w>diag</w>
@@ -21,6 +22,7 @@
       <w>logreport</w>
       <w>mdlog</w>
       <w>mdtype</w>
+      <w>meid</w>
       <w>meminfo</w>
       <w>netlog</w>
       <w>nofity</w>

@@ -35,11 +35,12 @@ public class UrlBuilder {
     public static String decorateCommonParams(String urlString, @Nullable String token) {
         Map<String, String> map = new HashMap<>();
         map.put(ApiConstants.PARAM_KEY, "Y3");
+        map.put(ApiConstants.PARAM_IMEI, TelephonyTools.getInstance().getImei() );
         map.put(ApiConstants.PARAM_TIME_STAMP, String.valueOf(System.currentTimeMillis()));
         map.put(ApiConstants.PARAM_TOKEN, UrlBuilder.buildSign(map, token));
-        if (!TextUtils.isEmpty(token)) {
-            map.put(ApiConstants.PARAM_TOKEN, token);
-        }
+//        if (!TextUtils.isEmpty(token)) {
+//            map.put(ApiConstants.PARAM_TOKEN, token);
+//        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(urlString).append("?");

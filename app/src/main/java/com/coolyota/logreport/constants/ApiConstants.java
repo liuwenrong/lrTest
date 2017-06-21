@@ -34,6 +34,10 @@ public class ApiConstants {
      * 产品型号在服务器端对应的key
      */
     public static final String PARAM_KEY = "key";
+    /**
+     * 手机的唯一表示IMEI
+     */
+    public static final String PARAM_IMEI = "imei";
 
     /**
      * 时间戳参数
