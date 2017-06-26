@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path path="DCIM/Camera" name="camera_photos" />
+    <external-path path="Pictures/Screenshots" name="phone_shots"/>
+    <external-path path="yota_log/UploadFile" name="logs_uploadfile"/>
+    <external-path path="yota_log/ScreenRecordVideo" name="logs_screenrecordvideo"/>
+    <external-path path="email/.scrapspace" name="email_scrapspace"/>
+    <external-path path="Tencent/QQ_Images" name="qq_image"/>
+    <external-path path="tencent/MicroMsg/WeiXin" name="weixin_image"/>
+    <external-path path="" name="all_photos" />
+</paths>

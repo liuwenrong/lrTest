@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.coolyota.logreport.LogSettingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <Switch
+            android:id="@+id/switch_generic"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/generic"/>
+
+        <Switch
+            android:id="@+id/switch_data_call"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/datacall"/>
+
+        <Switch
+            android:id="@+id/switch_imstest"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/imstest"/>
+
+        <Switch
+            android:id="@+id/switch_log_gps"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="GPS LOG"/>
+
+        <Switch
+            android:id="@+id/switch_log_wlan"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="WLAN LOG"/>
+
+        <Switch
+            android:id="@+id/switch_irat"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/irat"/>
+
+        <Switch
+            android:id="@+id/switch_poweron"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/power_on"/>
+
+        <Switch
+            android:id="@+id/switch_rf"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/rf"/>
+
+        <Switch
+            android:id="@+id/switch_uim"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/uim"/>
+
+        <Switch
+            android:id="@+id/switch_voice_call"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/voice_call"/>
+
+        <Switch
+            android:id="@+id/switch_mdlog"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/qxdm"/>
+
+    </LinearLayout>
+
+</ScrollView>
