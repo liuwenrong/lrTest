@@ -7,6 +7,7 @@
       <w>cdma</w>
       <w>coolyota</w>
       <w>datacall</w>
+      <w>dcard</w>
       <w>diag</w>
       <w>dmesg</w>
       <w>dropbox</w>
@@ -29,6 +30,7 @@
       <w>onoff</w>
       <w>packageslist</w>
       <w>poweron</w>
+      <w>proc</w>
       <w>pstore</w>
       <w>qxdm</w>
       <w>ramoops</w>

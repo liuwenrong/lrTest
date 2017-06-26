@@ -86,6 +86,45 @@ public class LogSettingActivity extends CloudBaseActivity {
 
         }
     };
+    View.OnClickListener mCleanLogOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View buttonView) {
+
+            new AlertDialog.Builder(getContext()).setMessage(R.string.confirm_clean_log)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            //先关闭开关,防止写入和删除冲突
+                            SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDTYPE, "0");
+                            SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDLOG, "false");
+                            mYotaLogSwitch.setChecked(false);
+                            mTasks.add(new PropSetTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG).execute(false));
+
+                            Toast.makeText(getContext(), "正在清除日志,请稍等...", Toast.LENGTH_SHORT).show();
+                            new Thread(){
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    LogUtil.cleanSdcardLog();
+
+                                    ((Activity)getContext()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), "日志已清除,如有需要,请重新打开开关记录log", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                                }
+                            }.start();
+
+                        }
+                    }).show();
+
+
+        }
+    };
     View.OnClickListener mSubmitOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View buttonView) {
@@ -109,6 +148,8 @@ public class LogSettingActivity extends CloudBaseActivity {
     private AsyncTask<?, ?, ?> mShowNotifyTask;
     private Button mSaveSdcard;
     private Button mQxdmBtn;
+    private Button mCleanLogBtn;
+    public Switch mYotaLogSwitch;
 
     public Context getContext() {
         return this;
@@ -120,13 +161,15 @@ public class LogSettingActivity extends CloudBaseActivity {
         setContentView(R.layout.activity_log_setting);
         getSupportActionBar().hide();
 
-        Switch mYotaLogSwitch = (Switch) findViewById(R.id.switch_yota_log);
+        mYotaLogSwitch = (Switch) findViewById(R.id.switch_yota_log);
         mTasks.add(executeParallel(new InitSwitchTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG)));
 
         mSaveSdcard = (Button) findViewById(R.id.btn_save_sdcard);
         mSaveSdcard.setOnClickListener(mSaveSDOnClickListener);
         mQxdmBtn = (Button) findViewById(R.id.btn_qxdm);
         mQxdmBtn.setOnClickListener(mQxdmOnClickListener);
+        mCleanLogBtn = (Button) findViewById(R.id.btn_clean_log);
+        mCleanLogBtn.setOnClickListener(mCleanLogOnClickListener);
 
         mSpinnerBugType = (Spinner) findViewById(R.id.spinner_bug_type);
         mSpinnerBugType.setSelection(mSpinnerBugType.getFirstVisiblePosition());
@@ -384,10 +427,6 @@ public class LogSettingActivity extends CloudBaseActivity {
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_ACCESS_FILE)
     private void addTestPhoto() {
-        /*Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image*//*");
-        intent.setPackage("com.journeyui.gallery3d");*/
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);
         intent.setType("image/*");

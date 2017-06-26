@@ -20,8 +20,8 @@ import java.util.TreeMap;
 /**
  * url的拼接工具
  *
- * @author wanchi@coolpad.com
- * @version 1.0, 2017/3/22
+ * @author liuwenrong@coolpad.com
+ * @version 1.0, 2017/6/16
  */
 public class UrlBuilder {
 

@@ -12,7 +12,7 @@ import com.coolyota.logreport.R;
 
 /**
  * 显示通知栏
- * Created by liuwenrong on 2016/7/30.
+ * Created by liuwenrong on 2016/6/20.
  */
 public class NotificationShow {
 

@@ -10,10 +10,12 @@ import android.app.Application;
  */
 public class CYLogReporterApplication extends Application {
 
+
+
     private static CYLogReporterApplication sApplication = new CYLogReporterApplication();
 
-    private CYLogReporterApplication(){
-
+    public CYLogReporterApplication(){
+        super();
     }
 
     public static CYLogReporterApplication getInstance(){

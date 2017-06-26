@@ -4,7 +4,7 @@ package com.coolyota.logreport.tools;
 import com.coolyota.logreport.tools.log.ReflectionCall;
 
 /**
- * Created by feizan on 2016/10/31.
+ * Created by liuwenrong on 2016/05/31.
  */
 
 public class SystemProperties {

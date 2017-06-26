@@ -35,7 +35,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
     public static final String Type_Mdlog = "mdlog";
 
     public static final String PERSIST_SYS_YOTALOG_MDTYPE = "persist.sys.yotalog.mdtype";
-    private static final String PERSIST_SYS_YOTALOG_MDLOG = "persist.sys.yotalog.mdlog";
+    public static final String PERSIST_SYS_YOTALOG_MDLOG = "persist.sys.yotalog.mdlog";
     public static final Map<String, String> sMapPropOn = new HashMap<>();
     private static final Map<String, String> sMapTypesProps = new HashMap<>();
     private static final Map<String, String> sMapPropOff = new HashMap<>();
@@ -95,7 +95,6 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         mDataCallSwitch = (Switch) findViewById(R.id.switch_data_call);
         mMutualProp.put(Type_DataCall, mDataCallSwitch);
         mTasks.add(executeParallel(new InitSwitchTask(mDataCallSwitch, Type_DataCall, PERSIST_SYS_YOTALOG_MDTYPE)));
-//        mDataCallSwitch.setOnCheckedChangeListener(mSaveSDOnClickListener);
 
         Switch mIMStestSwitch = (Switch) findViewById(R.id.switch_imstest);
         mMutualProp.put(Type_IMSTEST, mIMStestSwitch);
@@ -201,7 +200,6 @@ public class QxdmSettingActivity extends CloudBaseActivity {
                         if ( mMdLogSwitch.isChecked() ){
 
                             mMdLogSwitch.setChecked(false); //只要切换就把总开关关掉
-                            mTasks.add(new PropSetTask(mMdLogSwitch, Type_Mdlog, "false").execute(false));
 
                         }
 
@@ -211,18 +209,23 @@ public class QxdmSettingActivity extends CloudBaseActivity {
                             while (iterator.hasNext()) {
                                 final String type = iterator.next();
                                 final Switch aSwitch = mMutualProp.get(type);
+
+
                                 if (!type.equals(mType) && isChecked == aSwitch.isChecked()) {
                                     aSwitch.setOnCheckedChangeListener(null);
                                     aSwitch.setChecked(!isChecked);
                                     aSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) aSwitch.getTag());
-                                    new PropSetTask(aSwitch, type, PERSIST_SYS_YOTALOG_MDTYPE, false).execute(!isChecked);
                                 }
                             }
+
+
+                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
+                            mMdLogSwitch.setChecked(true);
+
                         } else {
+                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
                             mSelectedType = "";
                         }
-
-                        mTasks.add(new PropSetTask(mSwitchButton, mType, mProp).execute(isChecked));
 
 
                     } else { //QXDM总开关
@@ -232,7 +235,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
                             mMdLogSwitch.setChecked(false);
                         } else {
 
-                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp).execute(isChecked));
+                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, isChecked).execute(isChecked));
                         }
 
                     }
@@ -268,7 +271,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         protected void onPostExecute(Boolean checked) {
             mTasks.remove(this);
             mSwitchButton.setChecked(checked);
-            logger.debug("Get prop:" + mProp + " " + checked);
+            logger.debug("Get prop:" + mType + " " + checked);
         }
     }
 
@@ -312,19 +315,6 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         }
 
         private void waitForFinish(String prop, Boolean onoff) {
-            /*final String svc = sMapLogStatus.get(prop);
-            if (null != svc) {
-                String status = onoff ? "running" : "stopped";
-                int maxTime = 4;
-                while (maxTime-- > 0 && !status.equals(SystemProperties.get(svc, null))) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                logger.info("Svc[" + svc + "] status: " + SystemProperties.get(svc, null) + " after set prop: " + prop);
-            }*/
         }
 
         @Override

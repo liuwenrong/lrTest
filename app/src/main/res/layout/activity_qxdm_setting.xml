@@ -129,6 +129,7 @@
             android:layout_marginTop="1dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
+            android:visibility="gone"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
             android:text="@string/qxdm"/>

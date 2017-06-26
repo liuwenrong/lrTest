@@ -69,10 +69,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     private static final int REQUEST_CODE_ACTIVITY_PICK_PHOTO = 103;
     private static final int REQUEST_CODE_PERMISSION_ACCESS_FILE = 201;
     private static final int REQUEST_CODE_PERMISSION_READ_PHONE_STATE = 203;
-    //    private EditText mEditBugTitle;
-    //    private CheckBox mCheckMustHappen;
-//    private EditText mEditDate;
-//    private EditText mEditTime;
 
     private Spinner mSpinnerBugType;
     private EditText mEditBugDetails;
@@ -99,11 +95,7 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
                     deleteButton.setOnClickListener(BugReportActivity.this);
                 }
             } else if (ACTION_FOR_OFFLINE_LOG_OVER.equals(intent.getAction())) {
-//                mTextLogFilePath.setText(preferences.getString(LOG_FILE_PATH, ""));
-//                View deleteButton = findViewById(R.id.button_delete_log);
                 if (preferences.contains(LOG_FILE_PATH)) {
-//                    deleteButton.setVisibility(View.VISIBLE);
-//                    deleteButton.setOnClickListener(BugReportActivity.this);
                 }
             }
         }
@@ -132,15 +124,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
         mEditBugDetails = (EditText) findViewById(R.id.edit_bug_details);
 
         mBugCalendar = Calendar.getInstance();
-//        mEditDate = (EditText) findViewById(R.id.edit_bug_date);
-/*        mEditDate.setKeyListener(null);
-        mEditDate.setOnFocusChangeListener(this);
-        mEditDate.setText(String.format("%04d-%02d-%02d", mBugCalendar.get(Calendar.YEAR), (mBugCalendar.get(Calendar.MONTH) + 1),
-                mBugCalendar.get(Calendar.DAY_OF_MONTH)));*/
-//        mEditTime = (EditText) findViewById(R.id.edit_bug_time);
-/*        mEditTime.setKeyListener(null);
-        mEditTime.setOnFocusChangeListener(this);
-        mEditTime.setText(String.format("%02d:%02d", mBugCalendar.get(Calendar.HOUR_OF_DAY), mBugCalendar.get(Calendar.MINUTE)));*/
 
         mPicImageParent = (ViewGroup) findViewById(R.id.parent_add_pic);
         initPicImageParent();
@@ -156,12 +139,7 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
             deleteButton.setOnClickListener(this);
         }
 
-//        mTextLogFilePath = (TextView) findViewById(R.id.text_log_record_path);
-//        mTextLogFilePath.setText(preferences.getString(LOG_FILE_PATH, ""));
-//        deleteButton = findViewById(R.id.button_delete_log);
         if (preferences.contains(LOG_FILE_PATH)) {
-//            deleteButton.setVisibility(View.VISIBLE);
-//            deleteButton.setOnClickListener(this);
         }
 
         mBtnSubmit = (RotateInButton) findViewById(R.id.button_submit);
@@ -187,20 +165,10 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     }
 
     private void listenVideoLogBroadcast() {
-//        final IntentFilter filter = new IntentFilter();
-//        filter.addAction(ACTION_FOR_OFFLINE_LOG_OVER);
-//        filter.addAction(ACTION_SCREEN_VIDEO_FILE_OK);
-//        registerReceiver(mBetaReportReceiver, filter);
-//
-//        mReportFileMonitorConnection = new ReportFileMonitorConnection();
-//        bindService(new Intent(this, ReportFileMonitorService.class), mReportFileMonitorConnection, Service.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
-//        mReportFileMonitorConnection.unregister();
-//        unbindService(mReportFileMonitorConnection);
-//        unlistenVideoLogBroadcast();
         super.onDestroy();
     }
 
@@ -226,21 +194,11 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_ITEM_ID_OFFLINE_LOG, 0, R.string.offline_log);
-       /* menu.add(Menu.NONE, MENU_ITEM_ID_SCREEN_VIDEO, 1, R.string.screen_video);
-        menu.add(Menu.NONE, MENU_ITEM_ID_MY_FEEDBACK, 2, R.string.my_feedback);
-        menu.add(Menu.NONE, MENU_ITEM_ID_MY_AWARD, 3, R.string.my_award);
-        menu.add(Menu.NONE, MENU_ITEM_ID_LOGOUT, 4, R.string.logout);
-        menu.add(Menu.NONE, MENU_ITEM_ID_GPS_CONTROL, 5, "");*/
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-/*        if (isServiceWork(GPSPersistenceService.class.getName())) {
-            menu.getItem(5).setTitle(R.string.stop_gps_persistence);
-        } else {
-            menu.getItem(5).setTitle(R.string.restart_gps_persistence);
-        }*/
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -248,33 +206,12 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     public boolean onOptionsItemSelected(MenuItem item) {
         if (MENU_ITEM_ID_OFFLINE_LOG == item.getItemId()) {
             startActivityForResult(new Intent(this, LogSettingActivity.class), REQUEST_CODE_ACTIVITY_LOG_SETTING);
-            //startActivityForResult(new Intent("journeyui.intent.action.VOC_LOG_SETTING"), REQUEST_CODE_ACTIVITY_LOG_SETTING);
             return true;
-        }/* else if (MENU_ITEM_ID_SCREEN_VIDEO == item.getItemId()) {
-            startActivityForResult(new Intent(this, ScreenRecordActivity.class), REQUEST_CODE_ACTIVITY_SCREEN_VIDEO);
-            //startActivityForResult(new Intent(ScreenRecordActivity.ACTION_VOC_VIDEO_RECORD), REQUEST_CODE_ACTIVITY_SCREEN_VIDEO);
-            return true;
-        } else if (MENU_ITEM_ID_MY_AWARD == item.getItemId()) {
-            startActivity(new Intent(this, MyAwardActivity.class));
-        } else if (MENU_ITEM_ID_MY_FEEDBACK == item.getItemId()) {
-            startActivity(new Intent(this, ReportListActivity.class));
-        } else if (MENU_ITEM_ID_LOGOUT == item.getItemId()) {
-            logoutCurrentAccount();
-        } else if (MENU_ITEM_ID_GPS_CONTROL == item.getItemId()) {
-            switchGpsPersistence();
-        }*/
+        }
         return super.onOptionsItemSelected(item);
     }
 
     private void switchGpsPersistence() {
-       /* if (!isServiceWork(GPSPersistenceService.class.getName())) {
-            //GpsEnforceJobService.cacelJobServiceDelay(this);
-            startService(new Intent(this, GPSPersistenceService.class));
-        } else {
-            stopService(new Intent(this, GPSPersistenceService.class));
-            //GpsEnforceJobService.startJobServiceByDelay(this, 60 * 5);
-            //Toast.makeText(this, R.string.restart_gps_persistence_after_five_minues, Toast.LENGTH_LONG).show();
-        }*/
     }
 
     private boolean isServiceWork(String serviceName) {
@@ -300,7 +237,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
                 if (null == loginStatus) {
                     return false;
                 }
-                doLogout();
                 return null;
             }
 
@@ -315,24 +251,12 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
         });
     }
 
-    private void doLogout() {
-       /* Bundle input = new Bundle();
-        // 指定启动界面的屏幕方向
-        input.putInt(Constants.KEY_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        Coolcloud2 coolCloud = Coolcloud2.get(BugReportActivity.this, CloudApplication.APP_ID);
-        ResultFuture<Bundle> future = coolCloud.logout(BugReportActivity.this, input, null, null);
-        // 等待结果的返回，接口为阻塞式的，必须在线程中调用，否则可能导致UI线程ANR
-        future.getResult();*/
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_submit:
                 submitBugReport();
-                break;
-            case R.id.button_delete_file:
-                confirmDeleteUpload(getString(R.string.confirm_cancel_upload_video), mTextFilePath, FILE_PATH, v.getId());
                 break;
             /*case R.id.button_delete_log:
                 confirmDeleteUpload(getString(R.string.confirm_cancel_upload_log), mTextLogFilePath, LOG_FILE_PATH, v.getId());
@@ -410,32 +334,7 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
 
     @Nullable
     private Bundle getLoginAccountStatus() {
-/*        Coolcloud2 coolCloud = Coolcloud2.get(BugReportActivity.this, CloudApplication.APP_ID);
-        // 调用接口，这里不设置回调接口，使用getResult的方式
-        ResultFuture<Bundle> future = coolCloud.getDefaultAccount(BugReportActivity.this, null, null, null);
-        // 等待返回结果，该接口必须在线程中调用，否则可能导致UI线程ANR
-        Bundle result = future.getResult();
-        if (null != result) {
-            future = coolCloud.getTKTCached(BugReportActivity.this, null, null, null);
-            result = future.getResult(30, TimeUnit.SECONDS);
-            if (null != result) {
-                Bundle input = new Bundle();
-                // 设置校验类型
-                input.putString(Params.KEY_AUTHENTICATE_TYPE, Params.AUTHENTICATE_TYPE_TKT);
-                input.putString(Params.KEY_UID, result.getString(Params.KEY_UID));
-                input.putString(Params.KEY_TKT, result.getString(Params.KEY_TKT));
-                input.putString(Params.KEY_APP_ID, result.getString(Params.KEY_APP_ID));
-
-                // 调用校验接口，这里不设置回调接口，使用getResult的方式
-                future = coolCloud.authenticate(BugReportActivity.this, input, null, null);
-                if (null == future.getResult()) {
-                    return null;
-                }
-            }
-        }
-        return result;*/
         return null;
-
     }
 
     /**
@@ -460,45 +359,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_READ_PHONE_STATE)
     private void gotoLoginAccount() {
-/*        AsyncTaskCompat.executeParallel(new AsyncTask<Void, Void, Bundle>() {
-            @Override
-            protected void onPreExecute() {
-                mBtnSubmit.setInProgress(BugReportActivity.this, true);
-            }
-
-            @Override
-            protected Bundle doInBackground(Void... params) {
-                Bundle input = new Bundle();
-                // 设置横屏显示
-                input.putInt(Constants.KEY_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                // 设置登录方式，这里采用新建账户登录
-                input.putString(Constants.KEY_LOGIN_TYPE, Constants.LOGIN_TYPE_SYSTEM_ACCOUNT);
-
-                // 调用登录接口，这里不设置回调接口，使用getResult的方式
-                Coolcloud2 coolCloud = Coolcloud2.get(BugReportActivity.this, CloudApplication.APP_ID);
-                ResultFuture<Bundle> future = coolCloud.login(BugReportActivity.this, input, null, null);
-
-                // 等待登录返回，该接口必须在线程中调用，否则可能导致UI线程ANR
-                Bundle result = future.getResult();
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(Bundle result) {
-                if (null != result) {
-                    if (mEditContacts.length() == 0) {
-                        mEditContacts.setText(result.getString(Params.KEY_ACCOUNT));
-                    }
-                    mAccountID = result.getString(Params.KEY_UID);
-                    fireServiceForSubmit();
-                    Toast.makeText(BugReportActivity.this, R.string.report_save_ok, Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    mBtnSubmit.setInProgress(BugReportActivity.this, false);
-                    Toast.makeText(BugReportActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });*/
     }
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_ACCESS_FILE)
@@ -507,10 +367,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_ACCESS_FILE)
     private void addTestPhoto() {
-        /*Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image*//*");
-        intent.setPackage("com.journeyui.gallery3d");*/
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -520,51 +376,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         switch (v.getId()) {
-            /*case R.id.edit_bug_date:
-                if (!hasFocus) break;
-                DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        mEditDate.setText(String.format("%04d-%02d-%02d", year, (month + 1), dayOfMonth));
-                        mBugCalendar.set(year, month, dayOfMonth);
-                    }
-                }, mBugCalendar.get(Calendar.YEAR), mBugCalendar.get(Calendar.MONTH), mBugCalendar.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        findViewById(R.id.focus_view).requestFocus();
-                        //mEditDate.clearFocus();
-                    }
-                });
-                try {
-                    datePickerDialog.show();
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
-                break;*/
-            /*case R.id.edit_bug_time:
-                if (!hasFocus) break;
-                TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        mEditTime.setText(String.format("%02d:%02d", hourOfDay, minute));
-                        mBugCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        mBugCalendar.set(Calendar.MINUTE, minute);
-                    }
-                }, mBugCalendar.get(Calendar.HOUR_OF_DAY), mBugCalendar.get(Calendar.MINUTE), true);
-                timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        findViewById(R.id.focus_view).requestFocus();
-                        //mEditTime.clearFocus();
-                    }
-                });
-                try {
-                    timePickerDialog.show();
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
-                break;*/
         }
     }
 
@@ -670,36 +481,9 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
     }
 
     private class ReportFileMonitorConnection implements ServiceConnection {
-//        private IReportFileMonitor mReportFileMonitor;
-//        private IOnReportFileCreatedListener.Stub mOnReportFileCreatedListener;
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            /*mReportFileMonitor = IReportFileMonitor.Stub.asInterface(service);
-            mOnReportFileCreatedListener = new IOnReportFileCreatedListener.Stub() {
-                @Override
-                public void onLogZipCreated(Uri log) throws RemoteException {
-                }
-
-                @Override
-                public void onVideoFileCreated(final Uri videoUri) throws RemoteException {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTextFilePath.setText(
-                                    PreferenceManager.getDefaultSharedPreferences(BugReportActivity.this).getString(FILE_PATH, ""));
-                            View deleteButton = findViewById(R.id.button_delete_video);
-                            deleteButton.setVisibility(View.VISIBLE);
-                            deleteButton.setOnClickListener(BugReportActivity.this);
-                        }
-                    });
-                }
-            };
-            try {
-                mReportFileMonitor.registerReportFileListener(mOnReportFileCreatedListener);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
 
         @Override
@@ -707,11 +491,6 @@ public class BugReportActivity extends CloudBaseActivity implements View.OnClick
         }
 
         public void unregister() {
-           /* try {
-                mReportFileMonitor.unregisterReportFileListener(mOnReportFileCreatedListener);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }*/
         }
     }
 

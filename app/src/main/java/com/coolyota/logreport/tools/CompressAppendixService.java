@@ -62,8 +62,6 @@ public class CompressAppendixService extends Service {
         final Bundle extras = new Bundle(intent.getExtras());
         extras.putInt(START_ID, startId);
         mContext = this;
-//        collectBugReportFile();
-//        collectTypeLog(extras);
 
         genZip(extras);
 
@@ -385,30 +383,12 @@ public class CompressAppendixService extends Service {
                     Toast.makeText(getContext(), "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器", Toast.LENGTH_LONG).show();
                     if (0 == zipAllFile.length()) {
                         zipAllFile.delete();
-                        /*if (!extras.getBoolean(EXCEPT_VIDEO, false)) {
-                            saveToReportDb(null, extras);
-                        } else {
-                            ReportFileNotifier.notifyLogZipCreated(CompressAppendixService.this, null);
-                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(
-                                    ZIP_FILE_EXCEPT_VIDEO_PATH, null).apply();
-                            stopSelf(extras.getInt(START_ID));
-                        }*/
                     } else {
                         final Uri zipFileUri = Uri.fromFile(zipAllFile);
                         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).setData(zipFileUri));
-                        /*if (!extras.getBoolean(EXCEPT_VIDEO, false)) {
-                            saveToReportDb(zipAllFile, extras);
-                        } else {
-                            ReportFileNotifier.notifyLogZipCreated(CompressAppendixService.this,
-                                    FileProvider.getUriForFile(CompressAppendixService.this, "com.zeusis.betareport.fileprovider", zipAllFile));
-                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(ZIP_FILE_EXCEPT_VIDEO_PATH,
-                                    zipAllFile.getAbsolutePath()).apply();
-                            stopSelf(extras.getInt(START_ID));
-                        }*/
                     }
                 } else {
                     Toast.makeText(CompressAppendixService.this, getString(R.string.compress_file_failed), Toast.LENGTH_SHORT).show();
-//                    stopSelf(extras.getInt(START_ID));
                 }
             }
         }.execute();
@@ -422,7 +402,6 @@ public class CompressAppendixService extends Service {
         List<Date> dates = new ArrayList<>();
         File absFolderNameFile = new File(mAbsFolderName);
         if (absFolderNameFile.exists() && absFolderNameFile.isDirectory()) {
-//            ensureAllReadWrite(absFolderNameFile);
             if (null != absFolderNameFile && absFolderNameFile.exists()) {
                 if (absFolderNameFile.isFile() && 0 < absFolderNameFile.length()) {
                     return yotaLogFolders;

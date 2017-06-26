@@ -69,6 +69,7 @@
     <string name="confirm_cancel_upload_log">是否确认放弃上传日志？</string>
     <string name="logout">退出登录</string>
     <string name="abandon_current_edit_content">是否放弃提交已编辑的提单内容？</string>
+    <string name="confirm_clean_log">是否清除之前SD卡记录的日志？</string>
     <string name="please_input_bug_desc">请输入问题描述！</string>
     <string name="version_name_format">（Ver%1$s）</string>
     <string name="please_input_valid_contacts">请输入合法的联系方式，电话号码或邮箱！</string>

@@ -14,7 +14,6 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +78,7 @@ public class LogUtil {
     static Context context;
     private static String LOG_PATH_MEMORY_DIR;     //日志文件在内存中的路径(日志文件在安装目录中的路径) 内部存储
     /**
-     * 日志文件在sdcard中的路径 sdcard/CYLogReport
+     * 日志文件在sdcard中的路径 sdcard/yota_log
      */
     private static String LOG_PATH_SDCARD_DIR;
     @SuppressWarnings("unused")
@@ -109,24 +108,10 @@ public class LogUtil {
 
     public static void init(Context context) {
         LOG_PATH_MEMORY_DIR = context.getFilesDir().getAbsolutePath() + File.separator + "log";
-//        LOG_SERVICE_LOG_PATH = LOG_PATH_MEMORY_DIR + File.separator + logServiceLogName;
-        LOG_SERVICE_LOG_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME + File.separator + logServiceLogName;
         LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
 
         getLogAbsPathByDate();
 
-        /********************************************************/
-        try {
-            writer = new OutputStreamWriter(new FileOutputStream(
-                    LOG_SERVICE_LOG_PATH, true));
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        /** ******************************************************/
-//        PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
-//        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-//
-//        CURR_LOG_TYPE = getCurrLogType();
         Log.i(TAG, "LogService onCreate");
         setContext(context);
         register();
@@ -142,42 +127,14 @@ public class LogUtil {
      */
     public static void createLogCollector() {
 
-
-//        String androidFileName = getLogAbsPathByDate() + mAppsFolder + File.separator + "android1" + FILE_FORMAT;
-//        String androidCommand = "logcat -b main -v time -f " + androidFileName;
-
-//        String eventsFileName = mLogAbsPathByDate + mAppsFolder + File.separator + "events1" + FILE_FORMAT;
-//        String eventsCommand = "logcat -b events -v time -f " + eventsFileName;
-
-//        String radioFileName = mLogAbsPathByDate + mAppsFolder + File.separator + "radio1" + FILE_FORMAT;
-//        String radioCommand = "logcat -b radio -v time -f " + radioFileName;
-
-//        String pstoreFileName = mLogAbsPathByDate + mPstoreFolder + File.separator + "boot1" + FILE_FORMAT;
-//        String pstoreCommand = "cat " + "sys" + File.separator + "fs" + File.separator + "pstore" + File.separator + "console-ramoops"; //0B的文件,应用没有读的权限
-
-
-//        String kernelFileName = mLogAbsPathByDate + mKernelFolder + File.separator + "kinfo1" + FILE_FORMAT;
-//        String kernelCommand = "cat " + "sys" + File.separator + "fs" + File.separator + "pstore" + File.separator + "dmesg-ramoops-0.enc.z"; //应用没有读的权限
-//        String kernelCommand = "dmesg"; //应用没有读的权限
-
-//        String[] commands = new String[]{androidCommand, eventsCommand, radioCommand, pkgListCommand, meminfoCommand, kernelCommand};
-//        String[] fileNames = new String[]{androidFileName, eventsFileName, radioFileName, pkgListFileName, meminfoFileName, kernelFileName};
-
-//        commandLists.add(commandListKernel);
-
         mProcesses = new ArrayList<>();
 
         FileOutputStream out = null;
         try {
 
-//            Process androidPro = Runtime.getRuntime().exec(androidCommand);
-//            Process eventsPro = Runtime.getRuntime().exec(eventsCommand);
-//            Process radioPro = Runtime.getRuntime().exec(radioCommand);
-
             copyTombstonesToSdcard();
             copyPstoreToSdcard();
             copyDropboxToSdcard();
-//            copyNetLogToSdcard();
 
             collectorStatusInfo();
 
@@ -236,23 +193,6 @@ public class LogUtil {
 
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            /*String absAppsPath = LOG_PATH_SDCARD_DIR + mLogPathByDate + mAppsFolder;
-            File file = new File(absAppsPath);
-            if (!file.isDirectory()) {
-                mkOk = file.mkdirs();
-                if (!mkOk) {
-                    recordLogServiceLog(absAppsPath + ", dir is not created succ");
-//                    return;
-                }
-            }
-            String absKernelPath = LOG_PATH_SDCARD_DIR + mLogPathByDate + mKernelFolder;
-            file = new File(absKernelPath);
-            if (!file.isDirectory()) {
-                mkOk = file.mkdirs();
-                if (!mkOk) {
-                    recordLogServiceLog(absKernelPath + ", dir is not created succ");
-                }
-            }*/
 
             for (int i = 0; i < mFolders.length; i++) {
                 String absPath = LOG_PATH_SDCARD_DIR + mLogPathByDate + mFolders[i];
@@ -297,9 +237,6 @@ public class LogUtil {
 
         }
 
-
-//        unregisterReceiver(sdStateReceiver);
-//        unregisterReceiver(logTaskReceiver);
     }
 
     /**
@@ -309,34 +246,17 @@ public class LogUtil {
      */
     public static String getLogAbsPathByDate() {
         createLogDir();
-//        String logPathName = myLogSdf.format(new Date()) + File.separator;// 日志文件名称
-        // 日志文件名称
-//        mLogPathByDate = logPathName;
-        /*if(CURR_LOG_TYPE == MEMORY_TYPE){
-            CURR_INSTALL_LOG_NAME = mLogPathByDate;
-            Log.d(TAG, "Log stored in memory, the path is:"+LOG_PATH_MEMORY_DIR + File.separator + mLogPathByDate);
-            mLogAbsPathByDate = LOG_PATH_MEMORY_DIR + File.separator + mLogPathByDate;
-        }else{*/
         CURR_INSTALL_LOG_NAME = null;
         Log.d(TAG, "Log stored in SDcard, the path is:" + LOG_PATH_SDCARD_DIR + mLogPathByDate);
         mLogAbsPathByDate = LOG_PATH_SDCARD_DIR + mLogPathByDate;
-//        }
         return mLogAbsPathByDate;
     }
 
     private static void register() {
-        /*IntentFilter sdCarMonitorFilter = new IntentFilter();
-        sdCarMonitorFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        sdCarMonitorFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-        sdCarMonitorFilter.addDataScheme("file");
-        sdStateReceiver = new SDStateMonitorReceiver();
-        registerReceiver(sdStateReceiver, sdCarMonitorFilter);*/
 
         IntentFilter logTaskFilter = new IntentFilter();
         logTaskFilter.addAction(MONITOR_LOG_SIZE_ACTION);
         logTaskFilter.addAction(SWITCH_LOG_FILE_ACTION);
-//        logTaskReceiver = new LogTaskReceiver();
-//        getContext().registerReceiver(logTaskReceiver, logTaskFilter);
     }
 
     /**
@@ -374,26 +294,13 @@ public class LogUtil {
                 }
             }
         }
-//        if(processEvents != null){
-//            processEvents.destroy();
-//        }
         String packName = getContext().getPackageName();
         String myUser = getAppUser(packName, allProcList);
-        /*
-        recordLogServiceLog("app user is:"+myUser);
-        recordLogServiceLog("========================");
-        for (ProcessInfo processInfo : allProcList) {
-            recordLogServiceLog(processInfo.toString());
-        }
-        recordLogServiceLog("========================");
-        */
         for (ProcessInfo processInfo : allProcList) {
             if (processInfo.name.toLowerCase().equals("logcat")
                     && processInfo.user.equals(myUser)) {
                 android.os.Process.killProcess(Integer
                         .parseInt(processInfo.pid));
-                //recordLogServiceLog("kill another logcat process success,the process info is:"
-                //      + processInfo);
             }
         }
     }
@@ -411,8 +318,6 @@ public class LogUtil {
             deployLogSizeMonitorTask();
 //            deleteMemoryExpiredLog();
         } else {
-            moveLogfile();
-//            cancelLogSizeMonitorTask();
             deleteSDcardExpiredLog();
         }
     }
@@ -421,24 +326,6 @@ public class LogUtil {
      * 删除内存下过期的日志
      */
     private static void deleteSDcardExpiredLog() {
-       /* File file = new File(LOG_PATH_SDCARD_DIR);
-        if (file.isDirectory()) {
-            File[] allFiles = file.listFiles();
-            for (File logFile : allFiles) {
-                String fileName = logFile.getName();
-                if (logServiceLogName.equals(fileName)) {
-                    continue;
-                }
-                String createDateInfo = fileName;
-//                String createDateInfo = getFileNameWithoutExtension(fileName);
-                if (canDeleteSDLog(createDateInfo)) {
-                    logFile.delete();
-                    Log.d(TAG, "delete expired log success,the log path is:"
-                            + logFile.getAbsolutePath());
-
-                }
-            }
-        }*/
     }
 
     /**
@@ -480,12 +367,7 @@ public class LogUtil {
             return;
         }
         logSizeMoniting = true;
-//        Intent intent = new Intent(MONITOR_LOG_SIZE_ACTION);
-//        PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, 0);
-//        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        am.setRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(), MEMORY_LOG_FILE_MONITOR_INTERVAL, sender);
         Log.d(TAG, "deployLogSizeMonitorTask() succ !");
-        //recordLogServiceLog("deployLogSizeMonitorTask() succ ,start time is " + calendar.getTime().toLocaleString());
     }
 
     /**
@@ -573,6 +455,25 @@ public class LogUtil {
     }
 
     /**
+     * 清除sdcard的yota_log
+     */
+    public static void cleanSdcardLog() {
+        LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
+        File dir = new File(LOG_PATH_SDCARD_DIR);
+        deleteDirWithFile(dir);
+    }
+    public static void deleteDirWithFile(File dir) {
+        if (dir == null || !dir.exists() || !dir.isDirectory())
+            return;
+        for (File file : dir.listFiles()) {
+            if (file.isFile())
+                file.delete(); // 删除所有文件
+            else if (file.isDirectory())
+                deleteDirWithFile(file); // 递规的方式删除文件夹
+        }
+        dir.delete();// 删除目录本身
+    }
+    /**
      * 每次记录日志之前先清除日志的缓存, 不然会在两个日志文件中记录重复的日志
      * 可以在关闭 获取日志时清除,这样下次就不会重复了
      */
@@ -625,14 +526,12 @@ public class LogUtil {
     public static void moveLogfile() {
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            //recordLogServiceLog("move file failed, sd card does not mount");
             return;
         }
         File file = new File(LOG_PATH_SDCARD_DIR);
         if (!file.isDirectory()) {
             boolean mkOk = file.mkdirs();
             if (!mkOk) {
-                //recordLogServiceLog("move file failed,dir is not created succ");
                 return;
             }
         }
@@ -645,12 +544,10 @@ public class LogUtil {
                 if (logServiceLogName.equals(fileName)) {
                     continue;
                 }
-                //String createDateInfo = getFileNameWithoutExtension(fileName);
                 boolean isSucc = copy(logFile, new File(LOG_PATH_SDCARD_DIR
                         + File.separator + fileName));
                 if (isSucc) {
                     logFile.delete();
-                    //recordLogServiceLog("move file success,log name is:"+fileName);
                 }
             }
         }
@@ -720,17 +617,6 @@ public class LogUtil {
      * @param msg
      */
     private static void recordLogServiceLog(String msg) {
-        /*if (writer != null) {
-            try {
-                Date time = new Date();
-                writer.write(myLogSdf.format(time) + " : " + msg);
-                writer.write("\n");
-                writer.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG, e.getMessage(), e);
-            }
-        }*/
     }
 
     /**
@@ -880,10 +766,6 @@ public class LogUtil {
         @Override
         public void run() {
             try {
-//                wakeLock.acquire(); //唤醒手机
-
-                // 注释掉 不先清除日志
-//                clearLogCache();
 
                 List<String> orgProcessList = getAllProcess();
                 List<ProcessInfo> processInfoList = getProcessInfoList(orgProcessList);
@@ -895,7 +777,6 @@ public class LogUtil {
 
                 handleLog();
 
-//                wakeLock.release(); //释放
             } catch (Exception e) {
                 e.printStackTrace();
                 recordLogServiceLog(Log.getStackTraceString(e));
@@ -946,36 +827,5 @@ public class LogUtil {
             }
         }
     }
-
-    /*private void transferFileToZip(ZipOutputStream zipOs, String reportFilePath, String entryParentName) throws IOException {
-        InputStream is = null;
-        int length;
-        try {
-            ZipEntry entry;
-            if (TextUtils.isEmpty(entryParentName)) {
-                entry = new ZipEntry(new File(reportFilePath).getName());
-            } else {
-                entry = new ZipEntry(entryParentName + File.separator + new File(reportFilePath).getName());
-            }
-            zipOs.putNextEntry(entry);
-            is = new BufferedInputStream(new FileInputStream(reportFilePath));
-            while (-1 != (length = is.read(zipDataBuffer))) {
-                zipOs.write(zipDataBuffer, 0, length);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (null != is) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            zipOs.flush();
-            zipOs.closeEntry();
-        }
-    }*/
-
 
 }
