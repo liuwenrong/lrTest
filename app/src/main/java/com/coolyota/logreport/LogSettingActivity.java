@@ -6,37 +6,46 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.text.format.Formatter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coolyota.logreport.base.CloudBaseActivity;
+import com.coolyota.logreport.constants.ApiConstants;
 import com.coolyota.logreport.tools.AccountNameMask;
 import com.coolyota.logreport.tools.CompressAppendixService;
 import com.coolyota.logreport.tools.ImageDecoder;
 import com.coolyota.logreport.tools.LogUtil;
 import com.coolyota.logreport.tools.NotificationShow;
 import com.coolyota.logreport.tools.SystemProperties;
+import com.coolyota.logreport.tools.TelephonyTools;
 import com.coolyota.logreport.tools.permissiongen.PermissionGen;
 import com.coolyota.logreport.tools.permissiongen.PermissionSuccess;
+import com.coolyota.logreport.ui.CyNumberProgressBar;
 import com.coolyota.logreport.ui.RotateInButton;
 
 import java.io.File;
@@ -64,6 +73,7 @@ public class LogSettingActivity extends CloudBaseActivity {
     private List<String> mPicImageList = new ArrayList<>();
 
     private static final int REQUEST_CODE_PERMISSION_ACCESS_FILE = 201;
+    private static final int REQUEST_CODE_PERMISSION_READ_PHONE_STATE = 202;
 
     static {
         sMapPropOn.put(PERSIST_SYS_YOTA_LOG, "true");
@@ -150,6 +160,13 @@ public class LogSettingActivity extends CloudBaseActivity {
     private Button mQxdmBtn;
     private Button mCleanLogBtn;
     public Switch mYotaLogSwitch;
+    public LinearLayout mProgressContainer;
+    TextView tvDownloadSize;
+    TextView tvProgress;
+    TextView tvNetSpeed;
+    CyNumberProgressBar pbProgress;
+
+    public UploadServiceConn mUploadServiceConn;
 
     public Context getContext() {
         return this;
@@ -160,6 +177,8 @@ public class LogSettingActivity extends CloudBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_setting);
         getSupportActionBar().hide();
+
+//        PermissionGen.needPermission((Activity)getContext(), REQUEST_CODE_PERMISSION_READ_PHONE_STATE, Manifest.permission.READ_PHONE_STATE);
 
         mYotaLogSwitch = (Switch) findViewById(R.id.switch_yota_log);
         mTasks.add(executeParallel(new InitSwitchTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG)));
@@ -181,6 +200,18 @@ public class LogSettingActivity extends CloudBaseActivity {
 
         mBtnSubmit = (RotateInButton) findViewById(R.id.button_submit);
         mBtnSubmit.setOnClickListener(mSubmitOnClickListener);
+
+        mProgressContainer = (LinearLayout) findViewById(R.id.progress_container);
+        tvDownloadSize = (TextView) findViewById(R.id.downloadSize);
+        tvProgress = (TextView) findViewById(R.id.tvProgress);
+        tvNetSpeed = (TextView) findViewById(R.id.netSpeed);
+        pbProgress = (CyNumberProgressBar) findViewById(R.id.pbProgress);
+    }
+
+    @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_READ_PHONE_STATE)
+    void getImei(){
+        TelephonyTools.getInstance(this).getImei();
+
     }
 
     @Override
@@ -236,6 +267,7 @@ public class LogSettingActivity extends CloudBaseActivity {
     @Override
     protected void onDestroy() {
         cancelAllTasks();
+        unbindService(mUploadServiceConn);
         super.onDestroy();
     }
 
@@ -369,9 +401,9 @@ public class LogSettingActivity extends CloudBaseActivity {
     }
 
     private void submitBugReport() {
-//        if (checkBugDesc(false) && checkUserContacts()) {
+        if (checkBugDesc(false) && checkUserContacts()) {
         doRealSubmitBugReport();
-//        }
+        }
     }
     private void doRealSubmitBugReport() {
 
@@ -391,18 +423,21 @@ public class LogSettingActivity extends CloudBaseActivity {
             protected void onPostExecute(Bundle result) {
                 if (null != result) {
                     if (TextUtils.isEmpty(mEditContacts.getText().toString())) {
-                        mEditContacts.setText("10086");
+                        mEditContacts.setText("");
                     }
                     fireServiceForSubmit();
 //                    Toast.makeText(LogSettingActivity.this, R.string.report_save_ok, Toast.LENGTH_LONG).show();
-                    finish();
+//                    finish();
                 } else if (!isDestroyed()) {
-                    mBtnSubmit.setInProgress(LogSettingActivity.this, false);
+                    mBtnSubmit.setInProgress((Activity)getContext(), false);
                 }
             }
         });
 
     }
+
+
+
 
     /**
      * 压缩 并 提交到服务器
@@ -410,13 +445,103 @@ public class LogSettingActivity extends CloudBaseActivity {
     private void fireServiceForSubmit() {
         Intent serviceIntent = new Intent(getContext(), CompressAppendixService.class);
 
-//        serviceIntent.putExtra(CompressAppendixService.EVENT_CONTENT, mEditBugDetails.getText().toString());
+//        serviceIntent.putExtra(CompressAppendixService.UP_TYPE, getResources().getStringArray(R.array.bug_type_values)[mSpinnerBugType.getSelectedItemPosition()]);
+        serviceIntent.putExtra(CompressAppendixService.UP_TYPE, ApiConstants.UpType.upTypes[mSpinnerBugType.getSelectedItemPosition()]);
+
+        serviceIntent.putExtra(CompressAppendixService.BUG_DETAILS, mEditBugDetails.getText().toString());
 
         serviceIntent.putExtra(CompressAppendixService.USER_CONTACT, mEditContacts.getText().toString());
 
-//        serviceIntent.putExtra(CompressAppendixService.PIC_IMAGE_LIST, mPicImageList.toArray(new String[mPicImageList.size()]));
+        serviceIntent.putExtra(CompressAppendixService.PIC_IMAGE_LIST, mPicImageList.toArray(new String[mPicImageList.size()]));
 //        serviceIntent.putExtra(CompressAppendixService.DELETE_UPLOAD_FILES, ((CheckBox) findViewById(R.id.check_delete_upload_files)).isChecked());
+
+        mUploadServiceConn = new UploadServiceConn();
+        bindService(serviceIntent, mUploadServiceConn, BIND_AUTO_CREATE);
         startService(serviceIntent);
+        mProgressContainer.setVisibility(View.VISIBLE);
+/*
+        final File zipAllFile = new File(Environment.getExternalStorageDirectory(), FOLDER_NAME + File.separator + "UploadFile" + File
+                .separator + "a.zip");
+        Toast.makeText(getContext(), "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器", Toast.LENGTH_LONG).show();
+//                        final Uri zipFileUri = Uri.fromFile(zipAllFile);
+//                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).setData(zipFileUri));
+        final Map<String, Object> params = new HashMap<>();
+        params.put(ApiConstants.PARAM_LOG_TYPE, ApiConstants.LOG_TYPE_LOG);
+        params.put(ApiConstants.PARAM_PRO_TYPE, android.os.Build.MODEL);
+        params.put(ApiConstants.PARAM_SYS_VERSION, android.os.Build.VERSION.RELEASE);
+        params.put(ApiConstants.PARAM_UP_TYPE, ApiConstants.UpType.TYPE_SUGGESTIONS);
+
+        UploadFileUtil.uploadFile(ApiConstants.PATH_UPLOAD, params, zipAllFile);*/
+//        UploadFileUtil.uploadFileHttpClient(ApiConstants.PATH_UPLOAD, params, zipAllFile);
+
+    }
+
+    CompressAppendixService myService;
+    boolean mIsStartUpload = false;
+
+    class UploadServiceConn implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            myService=((CompressAppendixService.MyBinder)service).getMyService(); //获取MyService对象
+
+            /**
+             * 直接把当前对象传给service，这样service就可以随心所欲的调用本activity的各种可用方法
+             */
+//            myService.setMainActivity(MainActivity.this); //把当前对象传递给myService
+
+
+            /**
+             * 使用一个接口来实现回调，这样比上面方法更加灵活，推荐
+             */
+          myService.setUploadListener(new CompressAppendixService.UploadListener() {
+              @Override
+              public void updateBar(long totalSize, long currentSize, float progress, long networkSpeed) {
+
+                  if (!mIsStartUpload){
+                      mProgressContainer.setVisibility(View.VISIBLE);
+//                      mBtnSubmit.setVisibility(View.GONE);
+                      mIsStartUpload = true;
+                  } else {
+
+                      if (totalSize == currentSize) { //上传完成
+//                          mBtnSubmit.setVisibility(View.VISIBLE);
+                          mProgressContainer.setVisibility(View.GONE);
+                          mBtnSubmit.setInProgress((Activity)getContext(), false);
+                          mIsStartUpload = false;
+
+                      }
+
+                  }
+                  Log.i("LogSetting", "onProgressInUIThread: totalSize = " + totalSize + ", currentSize = " + currentSize + ", progress = " + progress+ ", netSpeed = "+ networkSpeed);
+                  String downloadLength = Formatter.formatFileSize(getApplicationContext(), currentSize);
+                  String totalLength = Formatter.formatFileSize(getApplicationContext(), totalSize);
+                  tvDownloadSize.setText(downloadLength + "/" + totalLength);
+                  String netSpeed = Formatter.formatFileSize(getApplicationContext(), networkSpeed);
+                  tvNetSpeed.setText(netSpeed + "/S");
+                  tvProgress.setText((Math.round(progress * 10000) * 1.0f / 100) + "%");
+                  pbProgress.setMax(100);
+                  pbProgress.setProgress((int) (progress * 100));
+
+
+              }
+
+              @Override
+              public void onFail() {
+                   //上传失败
+                      mBtnSubmit.setVisibility(View.VISIBLE);
+                      mProgressContainer.setVisibility(View.GONE);
+                      mBtnSubmit.setInProgress((Activity)getContext(), false);
+                      mIsStartUpload = false;
+
+                  }
+          });
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
     }
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_ACCESS_FILE)
@@ -597,8 +722,7 @@ public class LogSettingActivity extends CloudBaseActivity {
                             @Override
                             public void onClick(View v) {
                                 mCurrentAddPic = mOpImageIndex;
-                                PermissionGen.needPermission((Activity)getContext(), REQUEST_CODE_PERMISSION_ACCESS_FILE,
-                                        Manifest.permission.READ_EXTERNAL_STORAGE);
+                                PermissionGen.needPermission((Activity)getContext(), REQUEST_CODE_PERMISSION_ACCESS_FILE, Manifest.permission.READ_EXTERNAL_STORAGE);
                             }
                         });
                         if (!mImageBitmap.isRecycled()) {

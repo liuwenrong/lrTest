@@ -29,7 +29,7 @@ import java.util.List;
 import static android.content.Context.ALARM_SERVICE;
 
 /**
- * des:
+ * des: log工具,状态信息存至SD卡
  *
  * @author liuwenrong
  * @version 1.0, 2017/6/2

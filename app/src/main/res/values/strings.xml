@@ -95,6 +95,8 @@
     <string name="rf">RF</string>
     <string name="uim">UIM</string>
     <string name="voice_call">VoiceCall</string>
+    <string name="audio">Audio</string>
+    <string name="sensor">sensor</string>
     <string name="qxdm">开启/关闭qxdm</string>
     <string name="qxdm_btn_text">QXDM开关</string>
     <string name="save_sdcard_text">当前状态信息存至SD卡</string>

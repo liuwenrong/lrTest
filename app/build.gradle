@@ -1,26 +1,89 @@
 apply plugin: 'com.android.application'
 
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     defaultConfig {
         applicationId "com.coolyota.logreport"
-        minSdkVersion 23
-        targetSdkVersion 25
+        minSdkVersion 22
+        targetSdkVersion 22
         versionCode 1
         versionName "0.01"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    buildTypes { //这里面可以配置debug和release版本的一些参数，比如混淆、签名配置等
+
+        release { //release版本
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            buildConfigField "String", "BASE_URL", "\"http://pro.dcss.baoliyota.com\""
+            minifyEnabled false //是否开启混淆
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' //混淆文件位置
+//                signingConfig signingConfigs.keyConfig
+            lintOptions {
+                checkReleaseBuilds false
+                // Or, if you prefer, you can continue to check for errors in release builds,
+                // but continue the build even when errors are found:
+                abortOnError false
+            }
         }
+
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            buildConfigField "String", "BASE_URL", "\"http://test.dcss.baoliyota.com\""
+            minifyEnabled false
+            // 移除无用的resource文件
+//            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        // 输出apk名称为CY_Log_Reporter_v1.0_2015-01-15_coolyota.apk
+//                        def fileName = "CY_Log_Reporter_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+//                        output.outputFile = new File(outputFile.parent, fileName)
+//                    }
+//                }
+//            }
+        }
+
+//        release {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
+
     }
+
+        lintOptions {
+            checkReleaseBuilds false
+            // Or, if you prefer, you can continue to check for errors in release builds,
+            // but continue the build even when errors are found:
+            abortOnError false
+        }
+//    useLibrary 'org.apache.http.legacy'
+//    productFlavors {
+//        coolyota {}
+//        baoliyota {}
+//        productFlavors.all { flavor ->
+//            flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
+//        }
+//    }
 }
 
+
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //    provided fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -29,4 +92,13 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:25.1.0'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    //    provided files('libs/http_client_core_mime.jar')
+//    provided files('libs/httpmime-4.5.3.jar')
+//    provided files('libs/httpclient-4.5.3.jar')
+//    provided files('libs/httpcore-4.4.3.jar')
+    //    compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
+    //    compile 'maven.org.apache.httpcomponents.httpclient:4.5.3'
+//    provided 'org.apache.httpcomponents:httpclient:4.5.3'
+//    provided 'org.apache.httpcomponents:httpcore:4.4.6'
+//    provided 'org.apache.httpcomponents:httpmime:4.5.3'
 }

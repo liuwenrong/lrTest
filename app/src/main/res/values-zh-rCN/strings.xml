@@ -5,7 +5,7 @@
     <string name="not_set">未设置</string>
     <string name="bug_desc">问题描述</string>
     <string name="bug_title">标题（可选）</string>
-    <string name="bug_details_sample">请详细描述问题步骤，例如：\n1.打开某个App\n2.执行某个操作，如：点击新增按钮\n3.使用5秒后，系统强制退出</string>
+    <string name="bug_details_sample">请详细描述问题步骤</string>
     <string name="must_happen">是否必现</string>
     <string name="date">日期</string>
     <string name="happen_time">发生时间</string>

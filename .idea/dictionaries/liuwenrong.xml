@@ -8,6 +8,7 @@
       <w>coolyota</w>
       <w>datacall</w>
       <w>dcard</w>
+      <w>dcss</w>
       <w>diag</w>
       <w>dmesg</w>
       <w>dropbox</w>
@@ -39,7 +40,10 @@
       <w>succ</w>
       <w>sudo</w>
       <w>tcpdump</w>
+      <w>tele</w>
+      <w>userdebug</w>
       <w>wlan</w>
+      <w>xscn</w>
       <w>yotalog</w>
       <w>zeusis</w>
       <w>zslogs</w>

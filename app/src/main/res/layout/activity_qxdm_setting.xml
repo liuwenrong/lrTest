@@ -123,6 +123,28 @@
             android:text="@string/voice_call"/>
 
         <Switch
+            android:id="@+id/switch_audio"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/audio"/>
+
+        <Switch
+            android:id="@+id/switch_sensor"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:text="@string/sensor"/>
+
+        <Switch
             android:id="@+id/switch_mdlog"
             android:layout_width="match_parent"
             android:layout_height="56dp"

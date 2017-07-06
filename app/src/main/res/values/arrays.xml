@@ -17,7 +17,7 @@
         <item>WIFI_NET</item>
         <item>SYSTEM_PLAYER</item>
         <item>SYSTEM_UPGRADE</item>
-        <item>OTHERAPP</item>
+        <item>OTHER_APP</item>
     </string-array>
 
 </resources>

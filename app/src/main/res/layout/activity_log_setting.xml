@@ -20,7 +20,7 @@
         <Switch
             android:id="@+id/switch_yota_log"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
@@ -31,7 +31,7 @@
         <Button
             android:id="@+id/btn_save_sdcard"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="50dp"
             android:layout_marginTop="1dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
@@ -39,26 +39,38 @@
             android:paddingStart="@dimen/activity_padding"
             android:text="@string/save_sdcard_text"/>
 
-        <Button
-            android:id="@+id/btn_qxdm"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="1dp"
-            android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/activity_padding"
-            android:paddingStart="@dimen/activity_padding"
-            android:text="@string/qxdm_btn_text"/>
-        <Button
-            android:id="@+id/btn_clean_log"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="1dp"
-            android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/activity_padding"
-            android:paddingStart="@dimen/activity_padding"
-            android:text="@string/clean_log"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_qxdm"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingEnd="@dimen/activity_padding"
+                android:paddingStart="@dimen/activity_padding"
+                android:text="@string/qxdm_btn_text"/>
+            <Button
+                android:id="@+id/btn_clean_log"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:paddingEnd="@dimen/activity_padding"
+                android:paddingStart="@dimen/activity_padding"
+                android:text="@string/clean_log"/>
+
+        </LinearLayout>
+
+
+
 
         <RelativeLayout
             android:id="@+id/line_modify_bug_type"
@@ -94,13 +106,13 @@
             android:gravity="top|start"
             android:hint="@string/bug_details_sample"
             android:inputType="textMultiLine"
-            android:minLines="5"/>
+            android:minLines="2"/>
 
         <TextView
             style="@style/TextTitleStyle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:text="@string/upload_photo"/>
 
@@ -193,7 +205,7 @@
             android:gravity="center_vertical"
             android:paddingStart="0dp"
             android:checked="true"
-            android:visibility="visible"
+            android:visibility="gone"
             android:text="@string/delete_after_file_upload"/>
 
         <com.coolyota.logreport.ui.RotateInButton
@@ -205,6 +217,61 @@
             app:enabled="true"
             app:text="@string/submit">
         </com.coolyota.logreport.ui.RotateInButton>
+
+
+        <LinearLayout
+            android:id="@+id/progress_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/downloadSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="--M/--M"
+                    android:textSize="10sp"/>
+
+                <TextView
+                    android:id="@+id/netSpeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="---K/s"
+                    android:textSize="10sp"/>
+
+                <TextView
+                    android:id="@+id/tvProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="--.--%"
+                    android:textSize="10sp"/>
+
+            </RelativeLayout>
+
+            <com.coolyota.logreport.ui.CyNumberProgressBar
+                android:id="@+id/pbProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:progress_reached_bar_height="1.5dp"
+                app:progress_reached_color="#3498DB"
+                app:progress_text_color="#3498DB"
+                app:progress_text_size="10sp"
+                app:progress_unreached_bar_height="0.75dp"
+                app:progress_unreached_color="#CCCCCC"/>
+        </LinearLayout>
 
 
     </LinearLayout>

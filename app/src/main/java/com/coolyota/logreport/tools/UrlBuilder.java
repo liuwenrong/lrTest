@@ -32,22 +32,32 @@ public class UrlBuilder {
      * @param token     token不需要可以是null
      * @return 装饰过公共get参数以后的url
      */
-    public static String decorateCommonParams(String urlString, @Nullable String token) {
+    public static String decorateCommonParams(String urlString, @Nullable String token, Map<String, Object> params) {
         Map<String, String> map = new HashMap<>();
-        map.put(ApiConstants.PARAM_KEY, "Y3");
-        map.put(ApiConstants.PARAM_IMEI, TelephonyTools.getInstance().getImei() );
-        map.put(ApiConstants.PARAM_TIME_STAMP, String.valueOf(System.currentTimeMillis()));
-        map.put(ApiConstants.PARAM_TOKEN, UrlBuilder.buildSign(map, token));
+
+        String imei = TelephonyTools.getInstance(null).getImei();
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+        map.put(ApiConstants.PARAM_KEY, ApiConstants.VALUE_KEY);
+        map.put(ApiConstants.PARAM_IMEI, imei);
+        map.put(ApiConstants.PARAM_TIME_STAMP, timeStamp);
+
+        params.put(ApiConstants.PARAM_KEY, ApiConstants.VALUE_KEY);
+        params.put(ApiConstants.PARAM_IMEI, imei);
+        params.put(ApiConstants.PARAM_TIME_STAMP, timeStamp);
+
 //        if (!TextUtils.isEmpty(token)) {
 //            map.put(ApiConstants.PARAM_TOKEN, token);
 //        }
 
-        StringBuilder sb = new StringBuilder();
+        return urlString + "?token=" + UrlBuilder.buildSign(map, token);
+
+       /* StringBuilder sb = new StringBuilder();
         sb.append(urlString).append("?");
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+
+        for (Map.Entry<String, String> entry : mapToken.entrySet()) {
             sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
-        return sb.substring(0, sb.length() - 1);
+        return sb.substring(0, sb.length() - 1);*/
     }
 
     /**
@@ -69,12 +79,13 @@ public class UrlBuilder {
                 map.remove(entry.getKey());
             }
         }
-        map = sortMapByKey(map);// 排序
+//        map = sortMapByKey(map);// 排序
         StringBuilder signUrl = new StringBuilder();
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            signUrl.append("&").append(entry.getKey()).append("=").append(entry.getValue());
-        }
-        return MD5Utils.MD5(signUrl.substring(1), salt);
+        signUrl.append(map.get(ApiConstants.PARAM_KEY)).append(map.get(ApiConstants.PARAM_IMEI)).append(map.get(ApiConstants.PARAM_TIME_STAMP));
+//        for (Map.Entry<String, String> entry : map.entrySet()) {
+//            signUrl.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+//        }
+        return MD5Utils.MD5(signUrl.toString()/*, salt*/);
     }
 
     /**

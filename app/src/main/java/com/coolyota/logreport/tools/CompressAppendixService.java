@@ -3,8 +3,8 @@ package com.coolyota.logreport.tools;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -15,6 +15,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.coolyota.logreport.R;
+import com.coolyota.logreport.constants.ApiConstants;
+import com.coolyota.logreport.tools.UploadFileUtil.ReqProgressCallBack;
+import com.coolyota.logreport.tools.log.CYLog;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -32,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -46,10 +50,15 @@ import static com.coolyota.logreport.tools.LogUtil.FOLDER_NAME;
  */
 public class CompressAppendixService extends Service {
 
+    public CYLog mCYLog = new CYLog("CompressAppendixService");
+    public static final String UP_TYPE = "upType";
+    public static final String BUG_DETAILS = "bug_details";
     public static final String USER_CONTACT = "user_contact";
     public static final String PIC_IMAGE_LIST = "pic_image_list";
     private static final byte[] zipDataBuffer = new byte[1024 * 1024];
     private static final String START_ID = "start_id";
+
+    HashMap<String, File> mDeleteFileOrFolder = new HashMap<>();
 
     private Context mContext;
     /**
@@ -110,13 +119,15 @@ public class CompressAppendixService extends Service {
                     LogUtil.init(getContext());
                     LogUtil.collectorStatusInfo();
 
-                    //滚动日志与离线日志
-                    File dropbox = new File("/data/system/dropbox");
+                    //滚动日志与离线日志 系统的无法上传后删除, TODO 暂时注释
+                   /* File dropbox = new File("/data/system/dropbox");
                     if (dropbox.exists() && dropbox.isDirectory()) {
                         ensureAllReadWrite(dropbox);
                         boolean result = ensureTransferValidFileToGZip(zipOs, dropbox, "statusinfo", null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
+                    mDeleteFileOrFolder.put("dropbox", dropbox);*/
+
                     // anr日志
                     File anr = new File("/data/anr");
                     if (anr.exists() && anr.isDirectory()) {
@@ -124,6 +135,7 @@ public class CompressAppendixService extends Service {
                         boolean result = ensureTransferValidFileToGZip(zipOs, anr, "statusinfo", null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
+                    mDeleteFileOrFolder.put("anr", anr);
 
                     final File tombstones = new File("/data/tombstones");
                     if (tombstones.exists() && tombstones.isDirectory()) {
@@ -131,28 +143,30 @@ public class CompressAppendixService extends Service {
                         boolean result = ensureTransferValidFileToGZip(zipOs, tombstones, "statusinfo", null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
+                    // 没有删除权限
+//                    mDeleteFileOrFolder.put("tomb", tombstones);
 
-                    //Qxdm日志 diag_logs
-                    final File diagLogs = new File(mAbsFolderName + File.separator + "diag_logs");
+                    mAbsFolderName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
+                    //Qxdm日志 diag_logs 太大对服务器压力大 TODO 暂时注释
+                    /*final File diagLogs = new File(mAbsFolderName + File.separator + "diag_logs");
                     if (diagLogs.exists() && diagLogs.isDirectory()) {
                         ensureAllReadWrite(diagLogs);
                         boolean result = ensureTransferValidFileToGZip(zipOs, diagLogs, null, null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
+                    mDeleteFileOrFolder.put("diag_logs", diagLogs);*/
 
-
-
-                    mAbsFolderName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
                     final File statusinfo = new File(mAbsFolderName + File.separator + "statusinfo");
                     if (statusinfo.exists() && statusinfo.isDirectory()) {
                         ensureAllReadWrite(statusinfo);
                         boolean result = ensureTransferValidFileToGZip(zipOs, statusinfo, null, null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
+                    mDeleteFileOrFolder.put("statusinfo", statusinfo);
 
-                    // 获取底层最新的yot_log目录,如果第一个文件夹小于100M,压缩返回最新的和第二新的文件夹
+                    // 获取底层最新的yot_log目录,如果第一个文件夹小于10M,压缩返回最新的和第二新的文件夹
                     List<String> folderByDates = getYotaLogFoldersByTime();
-                    if(folderByDates.size() >= 2 && getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize100M){
+                    /*if(folderByDates.size() >= 2 && getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize10M){
 
                         String folderByDate0 = folderByDates.get(0);
                         final File yotalogDate0 = new File(mAbsFolderName + File.separator + folderByDate0);
@@ -161,6 +175,7 @@ public class CompressAppendixService extends Service {
                             boolean result = ensureTransferValidFileToGZip(zipOs, yotalogDate0, null, folderByDate0);
                             isZipEmpty = result ? false : isZipEmpty;
                         }
+                        mDeleteFileOrFolder.put("yota_log", yotalogDate0);
 
                         // history 上一个记录的文件夹存放在history目录下
                         String folderByDate1 = folderByDates.get(1);
@@ -170,12 +185,15 @@ public class CompressAppendixService extends Service {
                         transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", appEntryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", appEntryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", appEntryParentName);
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", appEntryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", appEntryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", appEntryParentName);
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", appEntryParentName);
+                        if (new File(appFolderName + File.separator + "android.txt").length() < 5 * 1024 * 1024){ //第一个文件小于10M
+
+                            transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", appEntryParentName);
+                        }
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", appEntryParentName);
 
 
                         String kernelFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "kernel";
@@ -194,9 +212,10 @@ public class CompressAppendixService extends Service {
                             isZipEmpty = result ? false : isZipEmpty;
                         }
 
+                        mDeleteFileOrFolder.put("history", new File( mAbsFolderName + File.separator + folderByDate1));
 
 
-                    } else if (folderByDates.size() > 0){
+                    } else */if (folderByDates.size() > 0){
                         //去各目录取文件,有些文件取3个
                         String folderByDate0 = folderByDates.get(0);
                         String entryParentName = "apps";
@@ -206,12 +225,15 @@ public class CompressAppendixService extends Service {
                         transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", entryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", entryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", entryParentName);
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", entryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", entryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", entryParentName);
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", entryParentName);
+                        if (new File(appFolderName + File.separator + "android.txt").length() < 10 * 1024 * 1024){ //第一个文件小于10M
+
+                            transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", entryParentName);
+                        }
+//                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", entryParentName);
 
                         String kernelFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "kernel";
                         File kernelDate0File = new File(kernelFolderName);
@@ -229,7 +251,7 @@ public class CompressAppendixService extends Service {
                             isZipEmpty = result ? false : isZipEmpty;
                         }
 
-
+                        mDeleteFileOrFolder.put("yota_log", new File(mAbsFolderName + File.separator + folderByDate0));
 
                     }
 
@@ -253,6 +275,7 @@ public class CompressAppendixService extends Service {
                         }
                     }
                 }
+                mDeleteFileOrFolder.put("zipAllFile", zipAllFile);
                 return zipAllFile;
             }
 
@@ -281,6 +304,31 @@ public class CompressAppendixService extends Service {
                 }
                 if (deleteDir) dir.delete();
             }
+
+            /**
+             * 删除已经上传的log
+             */
+            private void deleteUploadLogs() {
+                mCYLog.debug("删除已上传的文件");
+                Set<String> keys = mDeleteFileOrFolder.keySet();
+                for (String key: keys){
+
+                    File file = mDeleteFileOrFolder.get(key);
+                    if (file.exists()){
+                        if (file.isFile()){
+                            file.delete();
+                        }else if(file.isDirectory()) {
+                            if ("history".equals(key)) {
+                                deleteLogFileDir(file, true);
+                            }else {
+                                deleteLogFileDir(file, false);
+                            }
+                        }
+                    }
+
+                }
+            }
+
 
             private void cleanAllLogFiles() {
                 deleteLogFileDir(new File("/data/system/dropbox"), false);
@@ -378,14 +426,46 @@ public class CompressAppendixService extends Service {
             }
 
             @Override
-            protected void onPostExecute(File zipAllFile) {
+            protected void onPostExecute(final File zipAllFile) {
                 if (null != zipAllFile && zipAllFile.exists()) {
-                    Toast.makeText(getContext(), "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器", Toast.LENGTH_LONG).show();
                     if (0 == zipAllFile.length()) {
                         zipAllFile.delete();
                     } else {
-                        final Uri zipFileUri = Uri.fromFile(zipAllFile);
-                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).setData(zipFileUri));
+                        Toast.makeText(getContext(), "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器", Toast.LENGTH_LONG).show();
+//                        final Uri zipFileUri = Uri.fromFile(zipAllFile);
+//                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).setData(zipFileUri));
+                        final HashMap<String, Object> params = new HashMap<>();
+                        params.put(ApiConstants.PARAM_LOG_TYPE, ApiConstants.LOG_TYPE_LOG);
+                        params.put(ApiConstants.PARAM_PRO_TYPE, TelephonyTools.getProType());
+                        params.put(ApiConstants.PARAM_SYS_VERSION, TelephonyTools.getSysVersion());
+                        params.put(ApiConstants.PARAM_UP_TYPE, extras.getInt(UP_TYPE));
+                        params.put(ApiConstants.PARAM_UP_DESC, extras.getString(BUG_DETAILS));
+                        params.put(ApiConstants.PARAM_PHONE, extras.getString(USER_CONTACT));
+
+                        params.put(ApiConstants.PARAM_FILE, zipAllFile);
+
+//                        UploadFileUtil.uploadFile(ApiConstants.PATH_UPLOAD, params, zipAllFile);
+                        UploadFileUtil.upLoadFile(ApiConstants.PATH_UPLOAD, params, new ReqProgressCallBack<String>(){
+
+                            @Override
+                            public void onSuccessInUiThread() {
+
+                                deleteUploadLogs();
+                            }
+
+                            @Override
+                            public void onFail() {
+                                mUploadListener.onFail();
+                            }
+
+                            @Override
+                            public void onProgressInUIThread(long total, long current, float progress, long networkSpeed) {
+                                if (mUploadListener != null) {
+                                    mUploadListener.updateBar(total, current, progress, networkSpeed);
+                                }
+                            }
+                        });
+
                     }
                 } else {
                     Toast.makeText(CompressAppendixService.this, getString(R.string.compress_file_failed), Toast.LENGTH_SHORT).show();
@@ -393,6 +473,31 @@ public class CompressAppendixService extends Service {
             }
         }.execute();
 
+    }
+
+    /**
+     *
+     * @author liuwenrong
+     * 使用类部类，返回当前service的实例，用于activity，调用service的各种方法
+     *
+     */
+    public class MyBinder extends Binder
+    {
+        public CompressAppendixService getMyService()
+        {
+            return CompressAppendixService.this;
+        }
+    }
+
+    UploadListener mUploadListener;
+
+    public void setUploadListener(UploadListener listener){
+        mUploadListener = listener;
+    }
+
+    public interface UploadListener {
+        void updateBar(long totalSize, long currentSize, float progress, long networkSpeed);
+        void onFail();
     }
 
     public List<String> getYotaLogFoldersByTime(){
@@ -447,7 +552,7 @@ public class CompressAppendixService extends Service {
         return yotaLogFolders;
     }
 
-    private long mSize100M = 100 * 1024 * 1024;
+    private long mSize10M = 10 * 1024 * 1024; //100M 改成 10M,考虑到服务器的承载量有限
     /**
      * 获取文件夹大小
      * @param file File实例
@@ -493,6 +598,7 @@ public class CompressAppendixService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        Log.d("Compress", "服务器已绑定");
+        return new MyBinder();
     }
 }

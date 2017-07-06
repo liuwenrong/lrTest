@@ -31,6 +31,9 @@ public class QxdmSettingActivity extends CloudBaseActivity {
     private static final String Type_VoiceCall = "VoiceCall";
     public static final String Type_WLAN = "wlan";
     public static final String Type_GPS = "gps";
+    public static final String Type_AUDIO = "Audio";
+    public static final String Type_SENSOR = "sensor";
+
 
     public static final String Type_Mdlog = "mdlog";
 
@@ -51,6 +54,8 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         sMapPropOn.put(Type_VoiceCall, "VoiceCall");
         sMapPropOn.put(Type_WLAN, "wlan");
         sMapPropOn.put(Type_GPS, "gps");
+        sMapPropOn.put(Type_AUDIO, Type_AUDIO);
+        sMapPropOn.put(Type_SENSOR, Type_SENSOR);
 
         sMapPropOn.put(Type_Mdlog, "true");
     }
@@ -66,6 +71,8 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         sMapTypesProps.put(Type_VoiceCall, PERSIST_SYS_YOTALOG_MDTYPE);
         sMapTypesProps.put(Type_WLAN, PERSIST_SYS_YOTALOG_MDTYPE);
         sMapTypesProps.put(Type_GPS, PERSIST_SYS_YOTALOG_MDTYPE);
+        sMapTypesProps.put(Type_AUDIO, PERSIST_SYS_YOTALOG_MDTYPE);
+        sMapTypesProps.put(Type_SENSOR, PERSIST_SYS_YOTALOG_MDTYPE);
 
         sMapTypesProps.put(Type_Mdlog, PERSIST_SYS_YOTALOG_MDLOG);
     }
@@ -127,6 +134,14 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         Switch mGpsLogSwitch = (Switch) findViewById(R.id.switch_log_gps);
         mMutualProp.put(Type_GPS, mGpsLogSwitch);
         mTasks.add(executeParallel(new InitSwitchTask(mGpsLogSwitch, Type_GPS, PERSIST_SYS_YOTALOG_MDTYPE)));
+
+        Switch mAudioSwitch = (Switch) findViewById(R.id.switch_audio);
+        mMutualProp.put(Type_AUDIO, mAudioSwitch);
+        mTasks.add(executeParallel(new InitSwitchTask(mAudioSwitch, Type_AUDIO, PERSIST_SYS_YOTALOG_MDTYPE)));
+
+        Switch mSensorSwitch = (Switch) findViewById(R.id.switch_sensor);
+        mMutualProp.put(Type_SENSOR, mSensorSwitch);
+        mTasks.add(executeParallel(new InitSwitchTask(mSensorSwitch, Type_SENSOR, PERSIST_SYS_YOTALOG_MDTYPE)));
 
 
         mMdLogSwitch = (Switch)findViewById(R.id.switch_mdlog);
@@ -217,7 +232,6 @@ public class QxdmSettingActivity extends CloudBaseActivity {
                                     aSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) aSwitch.getTag());
                                 }
                             }
-
 
                             mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
                             mMdLogSwitch.setChecked(true);
