@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.coolyota.logreport.tools.log.CYLog;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,7 +114,6 @@ public class LogUtil {
 
         getLogAbsPathByDate();
 
-        Log.i(TAG, "LogService onCreate");
         setContext(context);
         register();
         deploySwitchLogFileTask();
@@ -139,7 +140,6 @@ public class LogUtil {
             collectorStatusInfo();
 
         } catch (Exception e) {
-            Log.e(TAG, "CollectorThread == >" + e.getMessage(), e);
             recordLogServiceLog("CollectorThread == >" + e.getMessage());
         } finally {
             if (out != null) {
@@ -209,7 +209,6 @@ public class LogUtil {
 
     public static void stopLog() {
 
-        Log.d(TAG, "stopLog: ");
         recordLogServiceLog("LogService onStop");
         if (writer != null) {
             try {
@@ -247,7 +246,6 @@ public class LogUtil {
     public static String getLogAbsPathByDate() {
         createLogDir();
         CURR_INSTALL_LOG_NAME = null;
-        Log.d(TAG, "Log stored in SDcard, the path is:" + LOG_PATH_SDCARD_DIR + mLogPathByDate);
         mLogAbsPathByDate = LOG_PATH_SDCARD_DIR + mLogPathByDate;
         return mLogAbsPathByDate;
     }
@@ -270,9 +268,7 @@ public class LogUtil {
             if (!file.exists()) {
                 return;
             }
-            Log.d(TAG, "checkLog() ==> The size of the log is too big?");
             if (file.length() >= MEMORY_LOG_FILE_MAX_SIZE) {
-                Log.d(TAG, "The log's size is too big!");
                 new LogCollectorThread().start();
             }
         }
@@ -343,7 +339,6 @@ public class LogUtil {
             Date createDate = myLogSdf.parse(createDateStr);
             canDel = createDate.before(expiredDate);
         } catch (ParseException e) {
-            Log.e(TAG, e.getMessage(), e);
             canDel = false;
         }
         return canDel;
@@ -367,7 +362,6 @@ public class LogUtil {
             return;
         }
         logSizeMoniting = true;
-        Log.d(TAG, "deployLogSizeMonitorTask() succ !");
     }
 
     /**
@@ -406,17 +400,14 @@ public class LogUtil {
             errorConsumer.start();
             outputConsumer.start();
             if (proc.waitFor() != 0) {
-                Log.e(TAG, "getAllProcess proc.waitFor() != 0");
                 recordLogServiceLog("getAllProcess proc.waitFor() != 0");
             }
         } catch (Exception e) {
-            Log.e(TAG, "getAllProcess failed", e);
             recordLogServiceLog("getAllProcess failed");
         } finally {
             try {
                 proc.destroy();
             } catch (Exception e) {
-                Log.e(TAG, "getAllProcess failed", e);
                 recordLogServiceLog("getAllProcess failed");
             }
         }
@@ -494,17 +485,14 @@ public class LogUtil {
             errorGobbler.start();
             outputGobbler.start();
             if (proc.waitFor() != 0) {
-                Log.e(TAG, " clearLogCache proc.waitFor() != 0");
                 recordLogServiceLog("clearLogCache clearLogCache proc.waitFor() != 0");
             }
         } catch (Exception e) {
-            Log.e(TAG, "clearLogCache failed", e);
             recordLogServiceLog("clearLogCache failed");
         } finally {
             try {
                 proc.destroy();
             } catch (Exception e) {
-                Log.e(TAG, "clearLogCache failed", e);
                 recordLogServiceLog("clearLogCache failed");
             }
         }
@@ -575,7 +563,6 @@ public class LogUtil {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, e.getMessage(), e);
             recordLogServiceLog("copy file fail");
             return false;
         } finally {
@@ -588,7 +575,6 @@ public class LogUtil {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(TAG, e.getMessage(), e);
                 recordLogServiceLog("copy file fail");
                 return false;
             }
@@ -602,7 +588,6 @@ public class LogUtil {
         byte[] buffer = new byte[8 * 1024];
         int count;
         String inStr = in.toString();
-        Log.e(TAG, "writeToFile: inStr = " + new String(inStr).toString());
         while ((count = in.read(buffer)) != -1) {
             out.write(buffer, 0, count);
         }
@@ -760,7 +745,6 @@ public class LogUtil {
 
         public LogCollectorThread() {
             super("LogCollectorThread");
-            Log.d(TAG, "LogCollectorThread is create");
         }
 
         @Override
@@ -826,6 +810,17 @@ public class LogUtil {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    public static void saveInfoToFile(String type, String msg, Context context) {
+        try {
+            String filePath = context.getCacheDir().getAbsolutePath() + type;
+            SaveInfo saveInfo = new SaveInfo(msg, type, filePath, context);
+            saveInfo.run();
+        } catch (Exception e) {
+            CYLog.e(TAG, e);
+        }
+
     }
 
 }

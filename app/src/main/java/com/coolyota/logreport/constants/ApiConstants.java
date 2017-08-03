@@ -16,12 +16,43 @@ import com.coolyota.logreport.BuildConfig;
 public class ApiConstants {
 
 
+    public static final boolean DebugEnabled = BuildConfig.LOG_DEBUG;
 //    public static final String BASE_URL = "http://120.77.80.97";
     public static final String BASE_URL = BuildConfig.BASE_URL;
 //    public static final String BASE_URL = "http://test.dcss.baoliyota.com";
 //    public static final String BASE_URL = "http://pro.dcss.baoliyota.com";
 //    private static final String BASE_URL = Constants.BASE_URL;
 
+    /**
+     * Broken pipe 有网络,但不能连接服务器
+     * Exception.detailMessage
+     */
+    public static final String NET_BROKEN_PIPE = "Broken pipe";
+    /**
+     * 服务器返回的成功码
+     */
+    public static final int SUCCESS_CODE = 0;
+    /**
+     * 服务器返回的失败码
+     */
+    public static final int FAIL_CODE = 1;
+    /**
+     * 文件太大
+     */
+    public static final int FILE_TOO_MAX_CODE = 2;
+    /**
+    /**
+     * 网络不可用
+     */
+    public static final int NET_UN_CODE = 3;
+    /**
+     * token 过期
+     */
+    public static final int TOKEN_CODE = 104;
+    /**
+     * 其他
+     */
+    public static final int OTHER_CODE = 105;
     /**
      * 上传路径
      */

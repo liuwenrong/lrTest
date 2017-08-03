@@ -1,9 +1,14 @@
 package com.coolyota.logreport;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -11,6 +16,7 @@ import android.widget.Toast;
 import com.coolyota.logreport.base.CloudBaseActivity;
 import com.coolyota.logreport.tools.NotificationShow;
 import com.coolyota.logreport.tools.SystemProperties;
+import com.coolyota.logreport.tools.log.CYLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +27,7 @@ import java.util.Map;
 import static android.support.v4.os.AsyncTaskCompat.executeParallel;
 
 public class QxdmSettingActivity extends CloudBaseActivity {
-    public static final String Type_Generic = "Generic";
+    public static final String Type_Modem = "Modem";
     private static final String Type_DataCall = "DataCall";
     public static final String Type_IMSTEST = "IMStest";
     public static final String Type_IRAT = "IRAT";
@@ -44,14 +50,14 @@ public class QxdmSettingActivity extends CloudBaseActivity {
     private static final Map<String, String> sMapPropOff = new HashMap<>();
 
     static {
-        sMapPropOn.put(Type_Generic, "Generic");
-        sMapPropOn.put(Type_DataCall, "DataCall");
-        sMapPropOn.put(Type_IMSTEST, "IMStest");
-        sMapPropOn.put(Type_IRAT, "IRAT");
-        sMapPropOn.put(Type_PowerOn, "PowerOn");
-        sMapPropOn.put(Type_RF, "RF");
-        sMapPropOn.put(Type_UIM, "UIM");
-        sMapPropOn.put(Type_VoiceCall, "VoiceCall");
+        sMapPropOn.put(Type_Modem, "Modem");
+//        sMapPropOn.put(Type_DataCall, "DataCall");
+//        sMapPropOn.put(Type_IMSTEST, "IMStest");
+//        sMapPropOn.put(Type_IRAT, "IRAT");
+//        sMapPropOn.put(Type_PowerOn, "PowerOn");
+//        sMapPropOn.put(Type_RF, "RF");
+//        sMapPropOn.put(Type_UIM, "UIM");
+//        sMapPropOn.put(Type_VoiceCall, "VoiceCall");
         sMapPropOn.put(Type_WLAN, "wlan");
         sMapPropOn.put(Type_GPS, "gps");
         sMapPropOn.put(Type_AUDIO, Type_AUDIO);
@@ -61,14 +67,14 @@ public class QxdmSettingActivity extends CloudBaseActivity {
     }
 
     static {
-        sMapTypesProps.put(Type_Generic, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_DataCall, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_IMSTEST, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_IRAT, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_PowerOn, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_RF, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_UIM, PERSIST_SYS_YOTALOG_MDTYPE);
-        sMapTypesProps.put(Type_VoiceCall, PERSIST_SYS_YOTALOG_MDTYPE);
+        sMapTypesProps.put(Type_Modem, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_DataCall, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_IMSTEST, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_IRAT, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_PowerOn, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_RF, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_UIM, PERSIST_SYS_YOTALOG_MDTYPE);
+//        sMapTypesProps.put(Type_VoiceCall, PERSIST_SYS_YOTALOG_MDTYPE);
         sMapTypesProps.put(Type_WLAN, PERSIST_SYS_YOTALOG_MDTYPE);
         sMapTypesProps.put(Type_GPS, PERSIST_SYS_YOTALOG_MDTYPE);
         sMapTypesProps.put(Type_AUDIO, PERSIST_SYS_YOTALOG_MDTYPE);
@@ -95,11 +101,11 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         setContentView(R.layout.activity_qxdm_setting);
         getSupportActionBar().hide();
 
-        Switch mGenericSwitch = (Switch) findViewById(R.id.switch_generic);
-        mMutualProp.put(Type_Generic, mGenericSwitch); //put完之后,只能开一个,类似单选
-        mTasks.add(executeParallel(new InitSwitchTask(mGenericSwitch, Type_Generic, PERSIST_SYS_YOTALOG_MDTYPE)));
+        Switch mGenericSwitch = (Switch) findViewById(R.id.switch_modem);
+        mMutualProp.put(Type_Modem, mGenericSwitch); //put完之后,只能开一个,类似单选
+        mTasks.add(executeParallel(new InitSwitchTask(mGenericSwitch, Type_Modem, PERSIST_SYS_YOTALOG_MDTYPE)));
 
-        mDataCallSwitch = (Switch) findViewById(R.id.switch_data_call);
+        /*mDataCallSwitch = (Switch) findViewById(R.id.switch_data_call);
         mMutualProp.put(Type_DataCall, mDataCallSwitch);
         mTasks.add(executeParallel(new InitSwitchTask(mDataCallSwitch, Type_DataCall, PERSIST_SYS_YOTALOG_MDTYPE)));
 
@@ -125,7 +131,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
 
         mVoiceCallSwitch = (Switch)findViewById(R.id.switch_voice_call);
         mMutualProp.put(Type_VoiceCall, mVoiceCallSwitch);
-        mTasks.add(executeParallel(new InitSwitchTask(mVoiceCallSwitch, Type_VoiceCall, PERSIST_SYS_YOTALOG_MDTYPE)));
+        mTasks.add(executeParallel(new InitSwitchTask(mVoiceCallSwitch, Type_VoiceCall, PERSIST_SYS_YOTALOG_MDTYPE)));*/
 
         Switch mWlanLogSwitch = (Switch) findViewById(R.id.switch_log_wlan);
         mMutualProp.put(Type_WLAN, mWlanLogSwitch);
@@ -207,36 +213,61 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         @Override
         protected void onPostExecute(Boolean checked) {
             super.onPostExecute(checked);
+            CYLog.d("211----", QxdmSettingActivity.class, "type = " + mType);
+
             final CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
 
+                    CYLog.d("225----", QxdmSettingActivity.class, "type = " + mType);
                     if (mMutualProp.containsKey(mType)) { //10种类型
-                        if ( mMdLogSwitch.isChecked() ){
 
-                            mMdLogSwitch.setChecked(false); //只要切换就把总开关关掉
-
-                        }
-
-                        if (isChecked) {
+                        if (isChecked) { //点击 选中
                             mSelectedType = mType;
                             final Iterator<String> iterator = mMutualProp.keySet().iterator();
-                            while (iterator.hasNext()) {
+                            while (iterator.hasNext()) { //遍历,
                                 final String type = iterator.next();
                                 final Switch aSwitch = mMutualProp.get(type);
 
 
-                                if (!type.equals(mType) && isChecked == aSwitch.isChecked()) {
+                                if (!type.equals(mType) && isChecked == aSwitch.isChecked()) { //关闭其他的已打开的开关
                                     aSwitch.setOnCheckedChangeListener(null);
                                     aSwitch.setChecked(!isChecked);
                                     aSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) aSwitch.getTag());
+                                    isCloseOther = true;
+
+                                }
+                            }
+                            if ( mMdLogSwitch.isChecked() ){
+
+                                mMdLogSwitch.setChecked(false); //只要切换就把总开关关掉
+                                if (!isCloseOther) {
+                                    sleepNoClick();
+                                }
+
+                            }
+                            if (isCloseOther) {
+                                sleep6NoClick(isChecked);
+                            } else {
+
+                                mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
+                                mMdLogSwitch.setChecked(true);
+                                if (!isCloseOther) {
+                                    sleepNoClick();
                                 }
                             }
 
-                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
-                            mMdLogSwitch.setChecked(true);
+                        } else { //点击关闭
 
-                        } else {
+                            if ( mMdLogSwitch.isChecked() ){
+
+                                mMdLogSwitch.setChecked(false); //只要切换就把总开关关掉
+                                if (!isCloseOther) {
+                                    sleepNoClick();
+                                }
+
+                            }
+
                             mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
                             mSelectedType = "";
                         }
@@ -247,6 +278,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
                         if (isChecked && TextUtils.isEmpty(mSelectedType)) {
                             Toast.makeText(getApplicationContext(), "请选择以上一种类型,才能打开QXDM开关", Toast.LENGTH_LONG).show();
                             mMdLogSwitch.setChecked(false);
+                            sleepNoClick();
                         } else {
 
                             mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, isChecked).execute(isChecked));
@@ -259,7 +291,68 @@ public class QxdmSettingActivity extends CloudBaseActivity {
             mSwitchButton.setOnCheckedChangeListener(listener);
             mSwitchButton.setTag(listener);
         }
+
+        private void sleep6NoClick(final boolean isChecked) {
+            showOrHideCover((Activity)getContext(), true);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(3000);//关闭后延时3秒在打开
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    QxdmSettingActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTasks.add(new PropSetTask(mSwitchButton, mType, mProp, false).execute(isChecked));
+                            mMdLogSwitch.setChecked(true);
+//                            showOrHideCover((Activity)getContext(), true);
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(3000);//打开后后延时3秒在设置成可点击
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    QxdmSettingActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showOrHideCover((Activity)getContext(), false);
+                                            isCloseOther = false;
+                                        }
+                                    });
+                                }
+                            }).start();
+                        }
+                    });
+                }
+            }).start();
+        }
     }
+
+    private void sleepNoClick() { //休眠3s且不可点击
+        showOrHideCover((Activity)getContext(), true);// 3s不可点击
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);//关闭后延时3秒在打开
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                QxdmSettingActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showOrHideCover((Activity) getContext(), false);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    boolean isCloseOther = false; //是否有关闭其他的开关,有的话加1s延时在打开其他开关,防止关闭出错
 
     private class PropGetTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -335,10 +428,44 @@ public class QxdmSettingActivity extends CloudBaseActivity {
         protected void onPostExecute(Void aVoid) {
             mTasks.remove(this);
             mSwitchButton.setEnabled(true);
-            logger.debug("Set prop:" + mProp + " " + mSwitchButton.isChecked());
-            if (mPrompt && mType.equals(Type_Mdlog) && mSwitchButton.isChecked()) {
-                Toast.makeText(QxdmSettingActivity.this, "QXDM日志存至sdcard/yota_log/diag_logs目录下", Toast.LENGTH_SHORT).show();
+            logger.debug("389---Set prop:" + mProp + ",mType = " + mType);
+            if (mPrompt && mType.equals(Type_Mdlog)) {
+
+                if ( mSwitchButton.isChecked()) {
+                    Toast.makeText(QxdmSettingActivity.this, "QXDM日志存至sdcard/yota_log/diag_logs目录下", Toast.LENGTH_SHORT).show();
+                }
             }
+
+
+
         }
+    }
+
+    private View mShelter;
+
+    /**
+     * 设置屏幕不可点击
+     * @param host
+     * @param inProgress
+     */
+    private void showOrHideCover(Activity host, boolean inProgress) {
+        CYLog.d("427---", QxdmSettingActivity.class, "inProgress = " + inProgress);
+        if (null == mShelter) {
+            mShelter = new View(getContext());
+            mShelter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
+        }
+        ViewParent viewParent = mShelter.getParent();
+        if (null != viewParent) ((ViewGroup) viewParent).removeView(mShelter);
+        if (inProgress) {
+            ViewGroup parent = (ViewGroup) host.findViewById(android.R.id.content);
+            parent.addView(mShelter);
+        }
+    }
+    public Context getContext() {
+        return this;
     }
 }

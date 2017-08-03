@@ -11,12 +11,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.coolyota.logreport.R;
 import com.coolyota.logreport.constants.ApiConstants;
-import com.coolyota.logreport.tools.UploadFileUtil.ReqProgressCallBack;
 import com.coolyota.logreport.tools.log.CYLog;
 
 import java.io.BufferedInputStream;
@@ -93,6 +91,11 @@ public class CompressAppendixService extends Service {
 
             @Override
             protected File doInBackground(Void... params) {
+
+                if (!NetUtil.isNetworkAvailable(getContext())) {
+                    return null;
+                }
+
                 File zipAllFile = new File(Environment.getExternalStorageDirectory(), FOLDER_NAME + File.separator + "UploadFile" + File
                         .separator + SystemProperties.get("ro.build.id", "") + "_" + getReportFileTimestamp() /* + "_" + imei */+ ".zip");
 
@@ -243,19 +246,17 @@ public class CompressAppendixService extends Service {
                             isZipEmpty = result ? false : isZipEmpty;
                         }
 
-                        String netlogFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "netlog";
-                        File netlogDate0File = new File(netlogFolderName);
+                        /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "netlog";
+                        File netlogDate0File = new File(netlogFolderName);// TODO 文件过大,暂时不用
                         if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
                             ensureAllReadWrite(netlogDate0File);
                             boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, null, null);
                             isZipEmpty = result ? false : isZipEmpty;
-                        }
+                        }*/
 
                         mDeleteFileOrFolder.put("yota_log", new File(mAbsFolderName + File.separator + folderByDate0));
 
                     }
-
-                   Log.i("service", "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器");
 
 //                    cleanAllLogFiles();
                 } catch (IOException e) {
@@ -318,11 +319,12 @@ public class CompressAppendixService extends Service {
                         if (file.isFile()){
                             file.delete();
                         }else if(file.isDirectory()) {
-                            if ("history".equals(key)) {
+                            deleteLogFileDir(file, true);
+                            /*if ("history".equals(key)) {
                                 deleteLogFileDir(file, true);
                             }else {
                                 deleteLogFileDir(file, false);
-                            }
+                            }*/
                         }
                     }
 
@@ -431,9 +433,31 @@ public class CompressAppendixService extends Service {
                     if (0 == zipAllFile.length()) {
                         zipAllFile.delete();
                     } else {
-                        Toast.makeText(getContext(), "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器", Toast.LENGTH_LONG).show();
+
+                        if (zipAllFile.length() >= mSize10M * 5) {
+                            if (mUploadListener != null) {
+                                mUploadListener.onFail();
+                                mUploadListener.sendMsg(ApiConstants.FILE_TOO_MAX_CODE, "文件大于50M,无法上传服务器");
+                                zipAllFile.delete();
+                            }
+                            return;
+                        }
 //                        final Uri zipFileUri = Uri.fromFile(zipAllFile);
 //                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).setData(zipFileUri));
+
+                        if (!NetUtil.isNetworkAvailable(getContext())){
+                            if (mUploadListener != null) {
+                                mUploadListener.onFail();
+                                mUploadListener.sendMsg(ApiConstants.NET_UN_CODE, "压缩完成,当前网络不可用,请确保能打开网页再试");
+                                zipAllFile.delete();
+                            }
+                            return;
+                        } else {
+                            if (mUploadListener != null) {
+                                mUploadListener.sendMsg(ApiConstants.OTHER_CODE, "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器");
+                            }
+                        }
+
                         final HashMap<String, Object> params = new HashMap<>();
                         params.put(ApiConstants.PARAM_LOG_TYPE, ApiConstants.LOG_TYPE_LOG);
                         params.put(ApiConstants.PARAM_PRO_TYPE, TelephonyTools.getProType());
@@ -445,26 +469,44 @@ public class CompressAppendixService extends Service {
                         params.put(ApiConstants.PARAM_FILE, zipAllFile);
 
 //                        UploadFileUtil.uploadFile(ApiConstants.PATH_UPLOAD, params, zipAllFile);
-                        UploadFileUtil.upLoadFile(ApiConstants.PATH_UPLOAD, params, new ReqProgressCallBack<String>(){
 
+                        new Thread(new Runnable() {
                             @Override
-                            public void onSuccessInUiThread() {
+                            public void run() {
+                                UploadFileUtil.upLoadFile(ApiConstants.PATH_UPLOAD, params, new UploadFileUtil.ReqProgressCallBack<String>(){
 
-                                deleteUploadLogs();
-                            }
+                                    @Override
+                                    public void onSuccessInUiThread() {
 
-                            @Override
-                            public void onFail() {
-                                mUploadListener.onFail();
-                            }
+                                        deleteUploadLogs();
+                                    }
 
-                            @Override
-                            public void onProgressInUIThread(long total, long current, float progress, long networkSpeed) {
-                                if (mUploadListener != null) {
-                                    mUploadListener.updateBar(total, current, progress, networkSpeed);
-                                }
+                                    @Override
+                                    public void onFail() {
+                                        zipAllFile.delete();
+                                        if (mUploadListener != null) {
+                                            mUploadListener.onFail();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void sendMsg(int code, String msg) {
+                                        if (mUploadListener != null) {
+                                            mUploadListener.sendMsg(code, msg);
+                                        }
+                                    }
+
+
+                                    @Override
+                                    public void onProgressInUIThread(long total, long current, float progress, long networkSpeed) {
+                                        if (mUploadListener != null) {
+                                            mUploadListener.updateBar(total, current, progress, networkSpeed);
+                                        }
+                                    }
+                                });
                             }
-                        });
+                        }
+                        ).start();
 
                     }
                 } else {
@@ -498,6 +540,7 @@ public class CompressAppendixService extends Service {
     public interface UploadListener {
         void updateBar(long totalSize, long currentSize, float progress, long networkSpeed);
         void onFail();
+        void sendMsg(int code, String msg);
     }
 
     public List<String> getYotaLogFoldersByTime(){
@@ -598,7 +641,6 @@ public class CompressAppendixService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d("Compress", "服务器已绑定");
         return new MyBinder();
     }
 }

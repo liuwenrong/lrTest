@@ -5,62 +5,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_padding"
-    android:paddingRight="@dimen/activity_padding"
-    android:paddingBottom="@dimen/activity_padding"
     android:scrollbars="none"
     tools:context="com.coolyota.logreport.LogSettingActivity">
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
-        <Switch
-            android:id="@+id/switch_yota_log"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="1dp"
+            android:layout_height="64dp"
             android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/activity_padding"
-            android:paddingStart="@dimen/activity_padding"
-            android:text="@string/routine_log"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            >
 
-        <Button
-            android:id="@+id/btn_save_sdcard"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="1dp"
-            android:background="@android:color/white"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/activity_padding"
-            android:paddingStart="@dimen/activity_padding"
-            android:text="@string/save_sdcard_text"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:paddingLeft="@dimen/activity_padding"
+                android:gravity="left|center_vertical"
+                android:text="@string/routine_log"
+                android:textColor="#212121"
+                />
+
+
+            <Switch
+                android:id="@+id/switch_yota_log"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="64dp"
+                android:button="@drawable/switch_selector"
+                android:buttonTintMode="screen"
+                android:layout_height="50dp"
+                android:layout_marginTop="1dp"
+
+                android:thumb="@null"
+                />
+        </LinearLayout>
+
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:orientation="horizontal">
+
             <Button
-                android:id="@+id/btn_qxdm"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="50dp"
-                android:layout_marginTop="1dp"
-                android:background="@android:color/white"
+                android:id="@+id/btn_save_sdcard"
+                android:text="@string/save_sdcard_text"
+
                 android:gravity="center_vertical"
+                android:background="@android:color/white"
                 android:paddingEnd="@dimen/activity_padding"
                 android:paddingStart="@dimen/activity_padding"
-                android:text="@string/qxdm_btn_text"/>
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="2"
+                />
+
             <Button
                 android:id="@+id/btn_clean_log"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="50dp"
                 android:layout_marginTop="1dp"
+                android:layout_weight="1"
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
                 android:paddingEnd="@dimen/activity_padding"
@@ -69,12 +85,23 @@
 
         </LinearLayout>
 
-
-
+        <Button
+            android:id="@+id/btn_qxdm"
+            android:text="@string/qxdm_btn_text"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            />
 
         <RelativeLayout
             android:id="@+id/line_modify_bug_type"
             android:layout_width="match_parent"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
             android:layout_height="@dimen/item_common_height"
             android:background="@drawable/profile_item_bg_color_selector">
 
@@ -87,6 +114,7 @@
                 android:text="@string/bug_type"/>
 
             <Spinner
+                android:visibility="gone"
                 android:id="@+id/spinner_bug_type"
                 style="@style/TextContentAppearanceSmall"
                 android:layout_width="wrap_content"
@@ -99,11 +127,15 @@
 
         <EditText
             android:id="@+id/edit_bug_details"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:background="@android:color/white"
             android:gravity="top|start"
+            android:textSize="14sp"
+            android:textColor="#000"
             android:hint="@string/bug_details_sample"
             android:inputType="textMultiLine"
             android:minLines="2"/>
@@ -111,6 +143,8 @@
         <TextView
             style="@style/TextTitleStyle"
             android:layout_width="match_parent"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
             android:layout_height="40dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
@@ -118,7 +152,10 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
+            >
 
             <LinearLayout
                 android:id="@+id/parent_add_pic"
@@ -188,10 +225,12 @@
         <EditText
             android:id="@+id/edit_phone_number"
             android:layout_width="match_parent"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"
             android:layout_height="@dimen/item_common_height"
+            android:layout_marginTop="5dp"
             android:background="@android:color/white"
             android:gravity="start|center_vertical"
-            android:layout_marginTop="5dp"
             android:hint="@string/phone_or_email"
             android:inputType="text"/>
 
@@ -202,13 +241,15 @@
             android:layout_height="@dimen/item_common_height"
             android:layout_marginTop="5dp"
             android:background="@android:color/white"
+            android:checked="true"
             android:gravity="center_vertical"
             android:paddingStart="0dp"
-            android:checked="true"
-            android:visibility="gone"
-            android:text="@string/delete_after_file_upload"/>
+            android:text="@string/delete_after_file_upload"
+            android:visibility="gone"/>
 
         <com.coolyota.logreport.ui.RotateInButton
+            android:layout_marginLeft="@dimen/activity_padding"
+            android:layout_marginRight="@dimen/activity_padding"
             android:id="@+id/button_submit"
             style="@style/SubmitRotateInButtonCommonStyle"
             android:layout_width="match_parent"
@@ -225,8 +266,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:orientation="vertical"
+            android:layout_marginLeft="@dimen/activity_padding"
+            android:layout_marginRight="@dimen/activity_padding"
             android:visibility="gone"
             >
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
@@ -274,6 +318,15 @@
         </LinearLayout>
 
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="18"
+            android:textColor="#f00"
+            android:textSize="14sp"
+            />
 
+
+    </LinearLayout>
 </ScrollView>

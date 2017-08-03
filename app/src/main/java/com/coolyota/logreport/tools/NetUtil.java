@@ -12,6 +12,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
+import com.coolyota.logreport.tools.log.CYLog;
+
 import java.security.MessageDigest;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -112,6 +114,30 @@ public    class NetUtil {
             }
 
             return typeString;
+        }
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        if (context == null) {
+            CYLog.e(TAG, NetUtil.class, "context is null");
+            return false;
+        } else if (checkPermissions(context, "android.permission.INTERNET")) {
+            ConnectivityManager cManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cManager == null) {
+                return false;
+            } else {
+                NetworkInfo info = cManager.getActiveNetworkInfo();
+                if (info != null && info.isAvailable()) {
+                    CYLog.i(TAG, NetUtil.class, "Network is available.");
+                    return true;
+                } else {
+                    CYLog.i(TAG, NetUtil.class, "Network is not available.");
+                    return false;
+                }
+            }
+        } else {
+            CYLog.e(TAG, NetUtil.class, "android.permission.INTERNET permission should be added into AndroidManifest.xml.");
+            return false;
         }
     }
 

@@ -15,4 +15,10 @@
     <color name="color_FF147DCD">#FF147DCD</color>
     <color name="color_FF0065B3">#FF0065B3</color>
     <color name="color_FF005799">#FF005799</color>
+    <color name="btn_info_edge">#e1e1e1</color>
+    <color name="btn_info_disabled_edge">#e1e1e1</color>
+    <color name="btn_info_disabled">#e1e1e1</color>
+    <color name="btn_info_pressed">#FF0065B3</color>
+    <color name="btn_info">#FF1BC1FF</color>
+    <color name="white">#fff</color>
 </resources>

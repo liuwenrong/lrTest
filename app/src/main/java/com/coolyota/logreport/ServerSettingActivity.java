@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -188,7 +187,6 @@ public class ServerSettingActivity extends CloudBaseActivity {
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         String className = ServerSettingActivity.class.getName();
-        Log.i("xx---", "getLaunchIntent: className = " + className);
         ComponentName compMain = new ComponentName(context.getPackageName(), className);
         intent.setComponent(compMain);
         // 如果打开了首页,用暗码打开该页面会跳转首页

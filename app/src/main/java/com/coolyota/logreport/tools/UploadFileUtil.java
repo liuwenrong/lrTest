@@ -2,10 +2,11 @@ package com.coolyota.logreport.tools;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.coolyota.logreport.CYLogReporterApplication;
+import com.coolyota.logreport.constants.ApiConstants;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -48,7 +49,7 @@ import static java.lang.String.valueOf;
 public class UploadFileUtil {
 
     private static final String TAG = "UploadFileUtil";
-    private static final int TIME_OUT = 10 * 1000; //超时时间
+    private static final int TIME_OUT = 60 * 1000; //超时时间
     private static final String CHARSET = "utf-8"; //设置编码
     private static final String PREFIX = "--";
     private static final String LINE_END = "\n";
@@ -77,7 +78,6 @@ public class UploadFileUtil {
                 requestBody.addFormDataPart(valueOf(entry.getKey()), valueOf(entry.getValue())).setType(MultipartBody.MIXED);
             }
         }
-        Log.i(TAG, "uploadFile: urlMD5 = " + urlMD5);
         Request request = new Request.Builder().url(urlMD5).post(requestBody.build()).build();
         // readTimeout("请求超时时间" , 时间单位);
         client.newBuilder().readTimeout(500, TimeUnit.SECONDS).build().newCall(request).enqueue(new Callback() {
@@ -99,16 +99,43 @@ public class UploadFileUtil {
 
     }
 
-    public static <T> void uploadSuccessToUiThread(final Call call, final Response response, final ReqProgressCallBack<T> callBackToService){
+    public static <T> void uploadSuccessToUiThread(final Call call, final Response response, final ReqProgressCallBack<T> callBackToService) {
         // 发送到主线程
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if (callBackToService == null) {
+                        return;
+                    }
+
                     String str = response.body().string();
-                    Log.i(TAG, response.message() + " , body " + str);
-                    callBackToService.onSuccessInUiThread();
-                    Toast.makeText(CYLogReporterApplication.getInstance(), "上传" + str, Toast.LENGTH_LONG).show();
+
+                    JSONObject jsonObj = null;
+                    try {
+                        jsonObj = new JSONObject(str);
+                        int code = jsonObj.getInt("code");
+                        String msg = jsonObj.getString("msg");
+                        if (code == ApiConstants.SUCCESS_CODE) {
+
+                            callBackToService.sendMsg(ApiConstants.SUCCESS_CODE, "上传到服务器" + msg);
+                            callBackToService.onSuccessInUiThread();
+                        } else if (code == ApiConstants.TOKEN_CODE) {
+
+                            callBackToService.onFail();
+                            callBackToService.sendMsg(ApiConstants.TOKEN_CODE, msg + ",请确认当前时间是否和服务器相同");
+                        } else {
+                            callBackToService.onFail();
+                            callBackToService.sendMsg(ApiConstants.OTHER_CODE, "上传到服务器" + str);
+                        }
+                    } catch (JSONException e) {
+                        callBackToService.onFail();
+                        callBackToService.sendMsg(ApiConstants.FAIL_CODE, str);
+                        e.printStackTrace();
+                    }
+
+
+//                    Toast.makeText(CYLogReporterApplication.getInstance(), "上传" + str, Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
 
                 }
@@ -116,16 +143,20 @@ public class UploadFileUtil {
         });
     }
 
-    public static <T> void uploadNotSuccess(final Call call, final Response response , final ReqProgressCallBack<T> callBackToService) {
+    public static <T> void uploadNotSuccess(final Call call, final Response response, final ReqProgressCallBack<T> callBackToService) {
         // 发送到主线程
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if (callBackToService == null) {
+                        return;
+                    }
+
                     callBackToService.onFail();
                     String string = response.body().string();
-                    Log.i(TAG, response.message() + " error : body " + string);
-                    Toast.makeText(CYLogReporterApplication.getInstance(), "" + string, Toast.LENGTH_LONG).show();
+                    callBackToService.sendMsg(ApiConstants.FAIL_CODE, "上传失败," + string);
+//                    Toast.makeText(CYLogReporterApplication.getInstance(), "" + string, Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
 
                 }
@@ -138,9 +169,16 @@ public class UploadFileUtil {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                if (callBackToService == null) {
+                    return;
+                }
+
                 callBackToService.onFail();
-                Log.i(TAG, "onFailure: call = " + call.toString() + ",e = " + e);
-                Toast.makeText(CYLogReporterApplication.getInstance(), "上传失败," + e, Toast.LENGTH_LONG).show();
+                if (ApiConstants.NET_BROKEN_PIPE.equals(e.getMessage())) {
+                    callBackToService.sendMsg(ApiConstants.FAIL_CODE, "未能上传到服务器,请检查网络是否能打开网页...");
+                } else {
+                    callBackToService.sendMsg(ApiConstants.FAIL_CODE, "上传失败," + e);
+                }
 
             }
         });
@@ -150,9 +188,9 @@ public class UploadFileUtil {
     /**
      * 带参数带进度 上传文件
      *
-     * @param url       接口地址
-     * @param paramsMap 参数
-     * @param callBackToService  回调
+     * @param url               接口地址
+     * @param paramsMap         参数
+     * @param callBackToService 回调
      * @param <T>
      */
     public static <T> void upLoadFile(String url, HashMap<String, Object> paramsMap, final ReqProgressCallBack<T> callBackToService) {
@@ -177,6 +215,7 @@ public class UploadFileUtil {
             //创建Request
             final Request request = new Request.Builder().url(urlMD5).post(body).build();
             final Call call = mOkHttpClient.newBuilder().writeTimeout(50, TimeUnit.SECONDS).build().newCall(request);
+            // enqueue异步方法,子线程
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -194,7 +233,6 @@ public class UploadFileUtil {
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
         }
     }
 
@@ -324,7 +362,6 @@ public class UploadFileUtil {
                 byte[] bytes = new byte[1024];
                 long totalBytes = file.length();
                 long curBytes = 0;
-                Log.i("cky", "total=" + totalBytes);
                 int len = 0;
                 while ((len = is.read(bytes)) != -1) {
                     curBytes += len;
@@ -341,7 +378,6 @@ public class UploadFileUtil {
                  * 当响应成功，获取响应的流
                  */
                 int code = conn.getResponseCode();
-                Log.i(TAG, "uploadHttpUrlConn: code = " + code);
                 sb.setLength(0);
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line;
@@ -355,25 +391,6 @@ public class UploadFileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public interface ReqProgressCallBack<T> extends ReqCallBack<T> {
-        /**
-         * 响应进度更新 在UI线程
-         */
-        void onProgressInUIThread(long total, long current, float progress, long networkSpeed);
-    }
-
-    public interface ReqCallBack<T> {
-        void onSuccessInUiThread();
-
-        void onFail();
-    }
-
-    public interface FileUploadListener {
-        public void onProgress(long pro, double percent);
-
-        public void onFinish(int code, String res, Map<String, List<String>> headers);
     }
 
     public static void uploadFileHttpClient(final String url, final Map<String, Object> params, File file) {
@@ -416,6 +433,27 @@ public class UploadFileUtil {
 //            e.printStackTrace();
 //        }
 
+    }
+
+    public interface ReqProgressCallBack<T> extends ReqCallBack<T> {
+        /**
+         * 响应进度更新 在UI线程
+         */
+        void onProgressInUIThread(long total, long current, float progress, long networkSpeed);
+    }
+
+    public interface ReqCallBack<T> {
+        void onSuccessInUiThread();
+
+        void onFail();
+
+        void sendMsg(int code, String msg);
+    }
+
+    public interface FileUploadListener {
+        public void onProgress(long pro, double percent);
+
+        public void onFinish(int code, String res, Map<String, List<String>> headers);
     }
 
 }

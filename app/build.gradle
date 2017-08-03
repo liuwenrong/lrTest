@@ -1,19 +1,22 @@
 apply plugin: 'com.android.application'
 
-def releaseTime() {
-    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
-}
 
 android {
+    signingConfigs {
+        config {
+            keyPassword 'android'
+            storeFile file('D:/Android/0workSpacesAS/coolyotaY3/logreport/app/debug.keystore-platform')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
-
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/DEPENDENCIES'
     }
-
     defaultConfig {
         applicationId "com.coolyota.logreport"
         minSdkVersion 22
@@ -26,16 +29,19 @@ android {
 
         release { //release版本
             buildConfigField "boolean", "LOG_DEBUG", "false"
-            buildConfigField "String", "BASE_URL", "\"http://pro.dcss.baoliyota.com\""
+//            buildConfigField "String", "BASE_URL", "\"http://pro.dcss.baoliyota.com\""
+            buildConfigField "String", "BASE_URL", "\"http://test.dcss.baoliyota.com\""
             minifyEnabled false //是否开启混淆
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' //混淆文件位置
-//                signingConfig signingConfigs.keyConfig
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //混淆文件位置
+                signingConfig signingConfigs.config
             lintOptions {
                 checkReleaseBuilds false
                 // Or, if you prefer, you can continue to check for errors in release builds,
                 // but continue the build even when errors are found:
                 abortOnError false
             }
+
         }
 
         debug {
@@ -45,39 +51,33 @@ android {
             // 移除无用的resource文件
 //            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            applicationVariants.all { variant ->
-//                variant.outputs.each { output ->
-//                    def outputFile = output.outputFile
-//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-//                        // 输出apk名称为CY_Log_Reporter_v1.0_2015-01-15_coolyota.apk
-//                        def fileName = "CY_Log_Reporter_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
-//                        output.outputFile = new File(outputFile.parent, fileName)
-//                    }
-//                }
-//            }
         }
 
-//        release {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
+        android.applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                def outputFile = output.outputFile
+                println("outputFile = " + outputFile)
+                if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                    def fileName
+                    if (variant.buildType.name == 'release') {
+                        fileName = "CY_Log_Reporter_user.apk"
+                    } else if (variant.buildType.name == 'debug') {
+                        fileName = "CY_Log_Reporter.apk"
+                    }
+                    output.outputFile = new File(outputFile.parent, fileName)
+                }
+            }
+        }
+
 
     }
-
-        lintOptions {
-            checkReleaseBuilds false
-            // Or, if you prefer, you can continue to check for errors in release builds,
-            // but continue the build even when errors are found:
-            abortOnError false
-        }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
 //    useLibrary 'org.apache.http.legacy'
-//    productFlavors {
-//        coolyota {}
-//        baoliyota {}
-//        productFlavors.all { flavor ->
-//            flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
-//        }
-//    }
 }
 
 
@@ -92,13 +92,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:25.1.0'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
-    //    provided files('libs/http_client_core_mime.jar')
-//    provided files('libs/httpmime-4.5.3.jar')
-//    provided files('libs/httpclient-4.5.3.jar')
-//    provided files('libs/httpcore-4.4.3.jar')
-    //    compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
-    //    compile 'maven.org.apache.httpcomponents.httpclient:4.5.3'
-//    provided 'org.apache.httpcomponents:httpclient:4.5.3'
-//    provided 'org.apache.httpcomponents:httpcore:4.4.6'
-//    provided 'org.apache.httpcomponents:httpmime:4.5.3'
+   /* compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:preference-v14:25.3.1'*/
 }

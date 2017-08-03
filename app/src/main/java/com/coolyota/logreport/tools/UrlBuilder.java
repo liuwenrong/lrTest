@@ -41,23 +41,20 @@ public class UrlBuilder {
         map.put(ApiConstants.PARAM_IMEI, imei);
         map.put(ApiConstants.PARAM_TIME_STAMP, timeStamp);
 
-        params.put(ApiConstants.PARAM_KEY, ApiConstants.VALUE_KEY);
-        params.put(ApiConstants.PARAM_IMEI, imei);
-        params.put(ApiConstants.PARAM_TIME_STAMP, timeStamp);
+        map.put(ApiConstants.PARAM_TOKEN, UrlBuilder.buildSign(map, token));
 
-//        if (!TextUtils.isEmpty(token)) {
-//            map.put(ApiConstants.PARAM_TOKEN, token);
-//        }
+//        params.put(ApiConstants.PARAM_KEY, ApiConstants.VALUE_KEY);
+//        params.put(ApiConstants.PARAM_IMEI, imei);
+//        params.put(ApiConstants.PARAM_TIME_STAMP, timeStamp);
+//        return urlString + "?token=" + UrlBuilder.buildSign(map, token);
 
-        return urlString + "?token=" + UrlBuilder.buildSign(map, token);
-
-       /* StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(urlString).append("?");
 
-        for (Map.Entry<String, String> entry : mapToken.entrySet()) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
-        return sb.substring(0, sb.length() - 1);*/
+        return sb.substring(0, sb.length() - 1);
     }
 
     /**

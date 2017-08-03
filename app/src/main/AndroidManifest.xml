@@ -17,13 +17,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".BugReportActivity">
+        <activity android:name=".BugReportActivity"
+                  android:screenOrientation="portrait"
+            >
         </activity>
 
-        <activity android:name=".LogSettingActivity">
+        <activity android:name=".LogSettingActivity"
+                  android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -31,8 +35,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".QxdmSettingActivity"/>
-        <activity android:name=".ServerSettingActivity"/>
+        <activity android:name=".QxdmSettingActivity"
+                  android:screenOrientation="portrait"
+            />
+        <activity android:name=".ServerSettingActivity"
+                  android:screenOrientation="portrait"
+            />
 
         <!--暗码接收者-->
         <receiver

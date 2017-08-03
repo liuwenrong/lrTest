@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.coolyota.logreport.BuildConfig;
+import com.coolyota.logreport.constants.ApiConstants;
 
 /**
  * des:
@@ -12,9 +13,41 @@ import com.coolyota.logreport.BuildConfig;
  * @version 1.0, 2017/6/2
  */
 public class CYLog {
+    CYLog() {
+    }
+
+    public static void v(String tag, Class<?> classobj, String msg) {
+        if (ApiConstants.DebugEnabled) {
+                Log.v(tag, classobj.getCanonicalName() + ": " + msg);
+        }
+    }
+
+    public static void d(String tag, Class<?> classobj, String msg) {
+        if (ApiConstants.DebugEnabled) {
+                Log.d(tag, classobj.getCanonicalName() + ": " + msg);
+        }
+    }
+
+    public static void i(String tag, Class<?> classobj, String msg) {
+        if (ApiConstants.DebugEnabled) {
+                Log.i(tag, classobj.getCanonicalName() + ": " + msg);
+        }
+    }
+
+    public static void w(String tag, Class<?> classobj, String msg) {
+        if (ApiConstants.DebugEnabled) {
+                Log.w(tag, classobj.getCanonicalName() + ": " + msg);
+        }
+    }
+
+    public static void e(String tag, Class<?> classobj, String msg) {
+        if (ApiConstants.DebugEnabled) {
+            Log.e(tag, classobj.getCanonicalName() + ": " + msg);
+        }
+    }
     public static final boolean DEBUG = BuildConfig.LOG_DEBUG;
-    private final String module;
-    private final String tag;
+    private static String module;
+    private static String tag;
 
     public CYLog(String module, String tag) {
         this.module = !TextUtils.isEmpty(module) ? module : "CoolYota";
@@ -25,7 +58,7 @@ public class CYLog {
         this("CoolYota", tag);
     }
 
-    public void e(String msg, Throwable tr) {
+    public static void e(String msg, Throwable tr) {
         Log.e(tag, msg, tr);
     }
 

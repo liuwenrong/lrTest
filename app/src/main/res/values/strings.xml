@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">CYLogReport</string>
-    <string name="bug_type">问题类型</string>
+    <string name="bug_type">问题和意见反馈</string>
     <string name="not_set">未设置</string>
     <string name="bug_desc">问题描述</string>
     <string name="bug_title">标题（可选）</string>
-    <string name="bug_details_sample">请详细描述问题步骤，例如：\n1.打开某个App\n2.执行某个操作，如：点击新增按钮\n3.使用5秒后，系统强制退出</string>
+<!--    <string name="bug_details_sample">请详细描述问题步骤</string>-->
+    <string name="bug_details_sample">请按步骤详细描述问题，例如：\n1.打开"XXX"App\n2.执行某个操作，如：点击新增按钮\n3.使用5秒后，系统强制退出。</string>
     <string name="must_happen">是否必现</string>
     <string name="date">日期</string>
     <string name="happen_time">发生时间</string>
@@ -87,7 +88,7 @@
     <string name="double_tap_save">双击保存</string>
     <string name="video_record_ing">录屏中</string>
     <string name="all_report_submited_successfully">全部问题单已提交！</string>
-    <string name="generic">Generic</string>
+    <string name="modem">Modem</string>
     <string name="datacall">DataCall</string>
     <string name="imstest">IMStest</string>
     <string name="irat">IRAT</string>
@@ -102,4 +103,9 @@
     <string name="save_sdcard_text">当前状态信息存至SD卡</string>
     <string name="routine_log">常规Log</string>
     <string name="clean_log">清除日志</string>
+    <string name="line">test</string>
+
+    <string name="confirm_clean_log">是否清除之前SD卡记录的日志？</string>
+
+
 </resources>

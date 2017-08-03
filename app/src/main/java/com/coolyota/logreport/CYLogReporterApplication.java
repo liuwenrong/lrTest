@@ -1,7 +1,6 @@
 package com.coolyota.logreport;
 
 import android.app.Application;
-import android.util.Log;
 
 /**
  * des:
@@ -16,7 +15,6 @@ public class CYLogReporterApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("CYLogApp", "onCreate");
         sApplication = this;
     }
 

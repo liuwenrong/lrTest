@@ -13,7 +13,7 @@
 
 
         <Switch
-            android:id="@+id/switch_generic"
+            android:id="@+id/switch_modem"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="1dp"
@@ -21,9 +21,9 @@
             android:gravity="center_vertical"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
-            android:text="@string/generic"/>
+            android:text="@string/modem"/>
 
-        <Switch
+        <!--<Switch
             android:id="@+id/switch_data_call"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -43,7 +43,7 @@
             android:gravity="center_vertical"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
-            android:text="@string/imstest"/>
+            android:text="@string/imstest"/>-->
 
         <Switch
             android:id="@+id/switch_log_gps"
@@ -67,7 +67,7 @@
             android:paddingStart="@dimen/activity_padding"
             android:text="WLAN LOG"/>
 
-        <Switch
+        <!--<Switch
             android:id="@+id/switch_irat"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -120,7 +120,7 @@
             android:gravity="center_vertical"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
-            android:text="@string/voice_call"/>
+            android:text="@string/voice_call"/>-->
 
         <Switch
             android:id="@+id/switch_audio"

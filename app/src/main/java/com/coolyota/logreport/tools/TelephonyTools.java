@@ -5,9 +5,9 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.coolyota.logreport.CYLogReporterApplication;
+import com.coolyota.logreport.tools.log.CYLog;
 
 /**
  * des: 
@@ -54,7 +54,7 @@ public class TelephonyTools {
      */
     public String getImei(){
         String imei = sTelephonyManager.getDeviceId();
-        Log.i("TelephonyTools", "getImei: imei = " + imei);
+        CYLog.i("TelephonyTools", TelephonyTools.class, "getImei: imei = " + imei);
         if (TextUtils.isEmpty(imei)){
             imei = getIMEI();
         }
