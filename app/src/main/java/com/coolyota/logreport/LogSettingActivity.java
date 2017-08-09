@@ -2,6 +2,7 @@ package com.coolyota.logreport;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 import com.coolyota.logreport.base.CloudBaseActivity;
 import com.coolyota.logreport.constants.ApiConstants;
 import com.coolyota.logreport.constants.CYConstants;
+import com.coolyota.logreport.service.LogSizeService;
 import com.coolyota.logreport.tools.AccountNameMask;
 import com.coolyota.logreport.tools.CompressAppendixService;
 import com.coolyota.logreport.tools.ImageDecoder;
@@ -140,44 +142,10 @@ public class LogSettingActivity extends CloudBaseActivity {
         @Override
         public void onClick(View buttonView) {
 
-            new AlertDialog.Builder(getContext()).setMessage(R.string.confirm_clean_log)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            showOrHideCover((Activity) getContext(), true);
-                            //先关闭开关,防止写入和删除冲突
-                            SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDTYPE, "0");
-                            SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDLOG, "false");
-                            mYotaLogSwitch.setChecked(false);
-                            mTasks.add(new PropSetTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG).execute(false));
-
-                            Toast.makeText(getContext(), "正在清除日志,请稍等...", Toast.LENGTH_SHORT).show();
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    super.run();
-                                    LogUtil.cleanSdcardLog();
-
-                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showAndSaveMsg(ApiConstants.OTHER_CODE, "日志已清除,请确保您需要的log开关已打开");
-//                                            Toast.makeText(getContext(), "日志已清除,如有需要,请重新打开开关记录log", Toast.LENGTH_LONG).show();
-                                            mYotaLogSwitch.setChecked(true);
-                                            showOrHideCover((Activity) getContext(), false);
-                                        }
-                                    });
-
-                                }
-                            }.start();
-
-                        }
-                    }).show();
-
+            clearLog();
 
         }
+
     };
     private AsyncTask<?, ?, ?> mShowNotifyTask;
     private Button mSaveSdcard;
@@ -192,6 +160,44 @@ public class LogSettingActivity extends CloudBaseActivity {
                 LogSettingActivity.class.getName());
         intent.setComponent(compMain);
         return intent;
+    }
+
+    private void clearLog() {
+        new AlertDialog.Builder(getContext()).setMessage(R.string.confirm_clean_log)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        showOrHideCover((Activity) getContext(), true);
+                        //先关闭开关,防止写入和删除冲突
+                        SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDTYPE, "0");
+                        SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDLOG, "false");
+                        mYotaLogSwitch.setChecked(false);
+                        mTasks.add(new PropSetTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG).execute(false));
+
+                        Toast.makeText(getContext(), "正在清除日志,请稍等...", Toast.LENGTH_SHORT).show();
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                super.run();
+                                LogUtil.cleanSdcardLog();
+
+                                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showAndSaveMsg(ApiConstants.OTHER_CODE, "日志已清除,请确保您需要的log开关已打开");
+//                                            Toast.makeText(getContext(), "日志已清除,如有需要,请重新打开开关记录log", Toast.LENGTH_LONG).show();
+                                        mYotaLogSwitch.setChecked(true);
+                                        showOrHideCover((Activity) getContext(), false);
+                                    }
+                                });
+
+                            }
+                        }.start();
+
+                    }
+                }).show();
     }
 
     private void showOrHideCover(Activity host, boolean inProgress) {
@@ -255,7 +261,26 @@ public class LogSettingActivity extends CloudBaseActivity {
 
         mTvMsg = (TextView) findViewById(R.id.tv_msg);
 
+        startLogSizeService();
     }
+
+    private void startLogSizeService() {
+        //检查Service状态
+        boolean isServiceRunning = false;
+
+        ActivityManager manager = (ActivityManager) CYLogReporterApplication.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("com.coolyota.logreport.service.LogSizeService".equals(service.service.getClassName())) {
+                isServiceRunning = true;
+            }
+        }
+//        Log.e("LogSettingAct", "40------onReceive: isServiceRunning = " + isServiceRunning);
+        if (!isServiceRunning) {
+            Intent i = new Intent(this, LogSizeService.class);
+            this.startService(i);
+        }
+    }
+
 
     @PermissionSuccess(requestCode = REQUEST_CODE_PERMISSION_READ_PHONE_STATE)
     void getImei() {
@@ -267,6 +292,13 @@ public class LogSettingActivity extends CloudBaseActivity {
     protected void onStart() {
         super.onStart();
         hideNofityIfNeed();
+
+        Intent intent = this.getIntent();
+        int type = intent.getIntExtra(NotificationShow.TYPE, -1);
+        if (type == NotificationShow.ID_LOG_DELETE) {
+            clearLog();
+        }
+
     }
 
     @Override

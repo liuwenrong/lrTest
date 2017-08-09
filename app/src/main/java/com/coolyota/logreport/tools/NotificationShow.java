@@ -17,7 +17,9 @@ import com.coolyota.logreport.R;
 public class NotificationShow {
 
     private static final int ID_LOG_RECORD = 111;
+    public static final int ID_LOG_DELETE = 113;
     public static final int ID_SCREEN_RECORD = 112;
+    public static final String TYPE = "type";
 
     public static void startLogRecording(Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -37,6 +39,28 @@ public class NotificationShow {
     public static void cancelLogRecording(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(ID_LOG_RECORD);
+    }
+    public static void startLogDeleteNotice(Context context, long size) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.drawable.ic_file_delete).setContentTitle(context.getString(R.string.offline_log))
+                .setContentText("Log大小" + FileUtil.getDataSize(size) + "可点击清理")
+                .setTicker(context.getString(R.string.log_recording))
+               // .setDefaults(NotificationCompat.DEFAULT_ALL)
+//                .setOngoing(true)
+                .setShowWhen(true)
+                .setAutoCancel(true);
+        Intent intent = new Intent(context, LogSettingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(TYPE, ID_LOG_DELETE);
+        builder.setContentIntent(PendingIntent.getActivity(context, ID_LOG_DELETE, intent, PendingIntent.FLAG_UPDATE_CURRENT |
+                PendingIntent.FLAG_UPDATE_CURRENT));
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(ID_LOG_DELETE, builder.build());
+    }
+
+    public static void cancelLogDeleteNotice(Context context) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(ID_LOG_DELETE);
     }
 
     public static Notification startScreenRecording(Context context) {

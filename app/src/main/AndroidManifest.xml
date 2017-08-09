@@ -7,10 +7,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.DUMP"/>
-
     <application
         android:name=".CYLogReporterApplication"
         android:allowBackup="true"
@@ -19,30 +15,45 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".BugReportActivity"
-                  android:screenOrientation="portrait"
-            >
+        <activity
+            android:name=".BugReportActivity"
+            android:screenOrientation="portrait">
         </activity>
-
-        <activity android:name=".LogSettingActivity"
-                  android:screenOrientation="portrait"
-            >
+        <activity
+            android:name=".LogSettingActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".QxdmSettingActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ServerSettingActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".QxdmSettingActivity"
-                  android:screenOrientation="portrait"
-            />
-        <activity android:name=".ServerSettingActivity"
-                  android:screenOrientation="portrait"
-            />
+        <!-- 监听开机广播 -->
+        <receiver android:name=".receiver.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
 
-        <!--暗码接收者-->
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- 监听开机广播 -->
+        <receiver android:name=".receiver.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- 暗码接收者 -->
         <receiver
             android:name=".SecretCodeReceiver"
             android:enabled="true"
@@ -56,7 +67,6 @@
                 <data
                     android:host="2018"
                     android:scheme="android_secret_code"/>
-
             </intent-filter>
         </receiver>
 
@@ -76,7 +86,17 @@
                 android:resource="@xml/filepaths"/>
         </provider>
 
-
+        <service
+            android:name=".service.LogSizeService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+        <!--            android:process="com.coolyota.logreport.service"-->
     </application>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.DUMP"/>
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
 </manifest>

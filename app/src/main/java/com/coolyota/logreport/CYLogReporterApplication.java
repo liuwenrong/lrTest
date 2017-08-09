@@ -1,6 +1,11 @@
 package com.coolyota.logreport;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+
+import com.coolyota.logreport.receiver.TimeTickReceiver;
 
 /**
  * des:
@@ -16,10 +21,16 @@ public class CYLogReporterApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sApplication = this;
+        IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+        TimeTickReceiver receiver = new TimeTickReceiver();
+        registerReceiver(receiver, filter);
     }
 
     public static CYLogReporterApplication getInstance(){
         return sApplication;
     }
 
+    public static Context getContext(){
+        return sApplication;
+    }
 }
