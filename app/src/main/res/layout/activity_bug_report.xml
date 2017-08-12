@@ -293,7 +293,7 @@
             android:inputType="text"/>
 
         <CheckBox
-            android:id="@+id/check_delete_upload_files"
+            android:id="@+id/check_reboot"
             style="@style/TextTitleStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_common_height"
@@ -303,7 +303,7 @@
             android:paddingStart="0dp"
             android:checked="true"
             android:visibility="gone"
-            android:text="@string/delete_after_file_upload"/>
+            android:text="@string/reboot"/>
 
         <com.coolyota.logreport.ui.RotateInButton
             android:id="@+id/button_submit"

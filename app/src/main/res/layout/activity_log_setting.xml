@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="none"
@@ -18,10 +19,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="@dimen/item_common_height"
             android:background="@android:color/white"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             >
 
             <TextView
@@ -42,7 +43,7 @@
                 android:layout_marginLeft="64dp"
                 android:button="@drawable/switch_selector"
                 android:buttonTintMode="screen"
-                android:layout_height="50dp"
+                android:layout_height="30dp"
                 android:layout_marginTop="1dp"
 
                 android:thumb="@null"
@@ -60,13 +61,12 @@
             <Button
                 android:id="@+id/btn_save_sdcard"
                 android:text="@string/save_sdcard_text"
-
                 android:gravity="center_vertical"
                 android:background="@android:color/white"
                 android:paddingEnd="@dimen/activity_padding"
                 android:paddingStart="@dimen/activity_padding"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="@dimen/item_common_height"
                 android:layout_marginTop="1dp"
                 android:layout_weight="2"
                 />
@@ -74,7 +74,7 @@
             <Button
                 android:id="@+id/btn_clean_log"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="@dimen/item_common_height"
                 android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@android:color/white"
@@ -93,7 +93,7 @@
             android:gravity="center"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/item_common_height"
             android:layout_marginTop="1dp"
             />
 
@@ -145,7 +145,7 @@
             android:layout_width="match_parent"
             android:paddingEnd="@dimen/activity_padding"
             android:paddingStart="@dimen/activity_padding"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/item_common_height"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:text="@string/upload_photo"/>
@@ -235,17 +235,17 @@
             android:inputType="text"/>
 
         <CheckBox
-            android:id="@+id/check_delete_upload_files"
+            android:id="@+id/check_reboot"
             style="@style/TextTitleStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_common_height"
             android:layout_marginTop="5dp"
             android:background="@android:color/white"
-            android:checked="true"
+            android:checked="false"
             android:gravity="center_vertical"
             android:paddingStart="0dp"
-            android:text="@string/delete_after_file_upload"
-            android:visibility="gone"/>
+            android:text="@string/reboot"
+            android:visibility="visible"/>
 
         <com.coolyota.logreport.ui.RotateInButton
             android:layout_marginLeft="@dimen/activity_padding"
@@ -264,7 +264,7 @@
             android:id="@+id/progress_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:orientation="vertical"
             android:layout_marginLeft="@dimen/activity_padding"
             android:layout_marginRight="@dimen/activity_padding"

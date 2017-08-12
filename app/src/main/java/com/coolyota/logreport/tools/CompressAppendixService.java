@@ -50,6 +50,7 @@ public class CompressAppendixService extends Service {
 
     public CYLog mCYLog = new CYLog("CompressAppendixService");
     public static final String UP_TYPE = "upType";
+    public static final String REBOOT_CHECKED_KEY = "reboot_checked";
     public static final String BUG_DETAILS = "bug_details";
     public static final String USER_CONTACT = "user_contact";
     public static final String PIC_IMAGE_LIST = "pic_image_list";
@@ -132,7 +133,7 @@ public class CompressAppendixService extends Service {
                     mDeleteFileOrFolder.put("dropbox", dropbox);*/
 
                     // anr日志
-                    File anr = new File("/data/anr");
+                    File anr = new File("/data/anr"); //traces.txt 文件
                     if (anr.exists() && anr.isDirectory()) {
                         ensureAllReadWrite(anr);
                         boolean result = ensureTransferValidFileToGZip(zipOs, anr, "statusinfo", null);
@@ -168,8 +169,10 @@ public class CompressAppendixService extends Service {
                     mDeleteFileOrFolder.put("statusinfo", statusinfo);
 
                     // 获取底层最新的yot_log目录,如果第一个文件夹小于10M,压缩返回最新的和第二新的文件夹
+                    boolean isRebootChecked = extras.getBoolean(REBOOT_CHECKED_KEY);
                     List<String> folderByDates = getYotaLogFoldersByTime();
-                    /*if(folderByDates.size() >= 2 && getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize10M){
+                    // 日期的文件夹大于两个, 且第一个文件夹小于10M 或者 或者勾选了 异常关机重启
+                    if(folderByDates.size() >= 2 && ( (getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize10M) || isRebootChecked) ){
 
                         String folderByDate0 = folderByDates.get(0);
                         final File yotalogDate0 = new File(mAbsFolderName + File.separator + folderByDate0);
@@ -182,7 +185,7 @@ public class CompressAppendixService extends Service {
 
                         // history 上一个记录的文件夹存放在history目录下
                         String folderByDate1 = folderByDates.get(1);
-                        String appEntryParentName = "history" + File.separator + "apps";
+                        String appEntryParentName = "history" + File.separator + "apps"; //部分apps的log 取最新的几个文件
                         String appFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "apps";
                         transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt", appEntryParentName);
                         transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", appEntryParentName);
@@ -199,7 +202,7 @@ public class CompressAppendixService extends Service {
 //                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", appEntryParentName);
 
 
-                        String kernelFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "kernel";
+                        String kernelFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "kernel"; //全部kernel
                         File kernelDate0File = new File(kernelFolderName);
                         if (kernelDate0File.exists() && kernelDate0File.isDirectory()) {
                             ensureAllReadWrite(kernelDate0File);
@@ -207,18 +210,19 @@ public class CompressAppendixService extends Service {
                             isZipEmpty = result ? false : isZipEmpty;
                         }
 
-                        String netlogFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "netlog";
+                        // TODO 文件过大,暂时不用
+                        /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "netlog";
                         File netlogDate0File = new File(netlogFolderName);
                         if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
                             ensureAllReadWrite(netlogDate0File);
                             boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, "history", null);
                             isZipEmpty = result ? false : isZipEmpty;
-                        }
+                        }*/
 
                         mDeleteFileOrFolder.put("history", new File( mAbsFolderName + File.separator + folderByDate1));
 
 
-                    } else */if (folderByDates.size() > 0){
+                    } else if (folderByDates.size() > 0){
                         //去各目录取文件,有些文件取3个
                         String folderByDate0 = folderByDates.get(0);
                         String entryParentName = "apps";

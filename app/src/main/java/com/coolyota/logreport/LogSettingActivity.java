@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -27,10 +28,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -221,6 +224,8 @@ public class LogSettingActivity extends CloudBaseActivity {
         return this;
     }
 
+    CheckBox mRebootCheck;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,6 +236,8 @@ public class LogSettingActivity extends CloudBaseActivity {
 //        setOverflowShowingAlways();
 
 //        PermissionGen.needPermission((Activity)getContext(), REQUEST_CODE_PERMISSION_READ_PHONE_STATE, Manifest.permission.READ_PHONE_STATE);
+        mScrollView = (ScrollView) findViewById(R.id.scroll_view);
+        mRebootCheck = (CheckBox) findViewById(R.id.check_reboot);
 
         mYotaLogSwitch = (Switch) findViewById(R.id.switch_yota_log);
         mTasks.add(executeParallel(new InitSwitchTask(mYotaLogSwitch, PERSIST_SYS_YOTA_LOG)));
@@ -418,6 +425,8 @@ public class LogSettingActivity extends CloudBaseActivity {
 //        serviceIntent.putExtra(CompressAppendixService.UP_TYPE, getResources().getStringArray(R.array.bug_type_values)[mSpinnerBugType.getSelectedItemPosition()]);
         serviceIntent.putExtra(CompressAppendixService.UP_TYPE, ApiConstants.UpType.upTypes[mSpinnerBugType.getSelectedItemPosition()]);
 
+        serviceIntent.putExtra(CompressAppendixService.REBOOT_CHECKED_KEY, mRebootCheck.isChecked());
+
         serviceIntent.putExtra(CompressAppendixService.BUG_DETAILS, mEditBugDetails.getText().toString());
 
         serviceIntent.putExtra(CompressAppendixService.USER_CONTACT, mEditContacts.getText().toString());
@@ -466,6 +475,7 @@ public class LogSettingActivity extends CloudBaseActivity {
         }
         //存文件
         LogUtil.saveInfoToFile(CYConstants.TYPE_LOG, saveMsg, getContext());
+        scrollToBottom();
     }
 
     private Dialog getDialog(String msg) {
@@ -780,6 +790,7 @@ public class LogSettingActivity extends CloudBaseActivity {
                         mProgressContainer.setVisibility(View.VISIBLE);
 //                      mBtnSubmit.setVisibility(View.GONE);
                         mIsStartUpload = true;
+                        scrollToBottom();
                     } else {
 
                         if (totalSize == currentSize) { //上传完成
@@ -900,6 +911,18 @@ public class LogSettingActivity extends CloudBaseActivity {
 
             mPicImageList.set(mOpImageIndex, mImagePicFile.getAbsolutePath());
         }
+    }
+
+    Handler mHandler = new Handler();
+    ScrollView mScrollView;
+
+    private void scrollToBottom(){
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 
 }
