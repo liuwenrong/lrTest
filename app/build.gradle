@@ -29,8 +29,8 @@ android {
 
         release { //release版本
             buildConfigField "boolean", "LOG_DEBUG", "false"
-//            buildConfigField "String", "BASE_URL", "\"http://pro.dcss.baoliyota.com\""
-            buildConfigField "String", "BASE_URL", "\"http://test.dcss.baoliyota.com\""
+            buildConfigField "String", "BASE_URL", "\"http://dcss.baoliyota.com\""
+//            buildConfigField "String", "BASE_URL", "\"http://test.dcss.baoliyota.com\""
             minifyEnabled false //是否开启混淆
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             //混淆文件位置

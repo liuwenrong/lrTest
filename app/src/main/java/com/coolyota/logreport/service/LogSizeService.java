@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
+import com.coolyota.logreport.BuildConfig;
+import com.coolyota.logreport.tools.ActivityUtils;
 import com.coolyota.logreport.tools.FileUtil;
 import com.coolyota.logreport.tools.NotificationShow;
 
@@ -48,7 +50,12 @@ public class LogSizeService extends Service {
 //            Log.e(TAG, "44----handleMessage: folderSize = " + folderSize );
 
             if (folderSize > FileUtil.LOG_FILE_MAX_SIZE) {
-                NotificationShow.startLogDeleteNotice(LogSizeService.this, folderSize);
+
+                String packageName = ActivityUtils.getTopPackageName(getApplicationContext());
+//                Log.i(TAG, "handleMessage: ------55------packageName = " + packageName);
+                if (!packageName.equals(BuildConfig.APPLICATION_ID)) {
+                    NotificationShow.startLogDeleteNotice(LogSizeService.this, folderSize);
+                }
             }
 
             super.handleMessage(msg);

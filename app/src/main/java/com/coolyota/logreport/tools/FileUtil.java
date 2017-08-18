@@ -61,7 +61,7 @@ public class FileUtil {
             float gbSize = size / 1024f / 1024f / 1024f;
             return decimalFormat.format(gbSize) + "GB";
         } else {
-            return "size: error";
+            return "太大";
         }
 
     }

@@ -76,6 +76,7 @@ public class LogSettingActivity extends CloudBaseActivity {
     private static final int REQUEST_CODE_PERMISSION_ACCESS_FILE = 201;
     private static final int REQUEST_CODE_PERMISSION_READ_PHONE_STATE = 202;
     private static final int REQUEST_CODE_ACTIVITY_PICK_PHOTO = 103;
+    private static final String TAG = "LogSettingAct";
     private static String mMsg = "";
 
     static {
@@ -189,6 +190,7 @@ public class LogSettingActivity extends CloudBaseActivity {
                                 ((Activity) getContext()).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        NotificationShow.cancelLogDeleteNotice(LogSettingActivity.this);
                                         showAndSaveMsg(ApiConstants.OTHER_CODE, "日志已清除,请确保您需要的log开关已打开");
 //                                            Toast.makeText(getContext(), "日志已清除,如有需要,请重新打开开关记录log", Toast.LENGTH_LONG).show();
                                         mYotaLogSwitch.setChecked(true);
@@ -350,6 +352,7 @@ public class LogSettingActivity extends CloudBaseActivity {
     private void hideNofityIfNeed() {
         if (null != mShowNotifyTask) mShowNotifyTask.cancel(false);
         NotificationShow.cancelLogRecording(LogSettingActivity.this);
+        NotificationShow.cancelLogDeleteNotice(LogSettingActivity.this);
     }
 
     @Override
@@ -391,8 +394,14 @@ public class LogSettingActivity extends CloudBaseActivity {
             @Override
             protected void onPostExecute(Bundle result) {
                 if (null != result && NetUtil.isNetworkAvailable(getContext())) {
-                    if (TextUtils.isEmpty(mEditContacts.getText().toString())) {
-                        mEditContacts.setText("");
+                    if (TextUtils.isEmpty(mEditContacts.getText().toString())) { //号码为空时去获取用户手机号
+                        String phone1Name = TelephonyTools.getInstance(getContext()).getLine1Number();
+//                        Log.i(TAG, "--400------onPostExecute: phone1Name = " + phone1Name);
+                        if (TextUtils.isEmpty(phone1Name)) {
+                            mEditContacts.setText("");
+                        } else {
+                            mEditContacts.setText(phone1Name);
+                        }
                     }
                     fireServiceForSubmit();
 //                    Toast.makeText(LogSettingActivity.this, R.string.report_save_ok, Toast.LENGTH_LONG).show();

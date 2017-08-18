@@ -49,6 +49,13 @@ public class TelephonyTools {
     }
 
     /**
+     * @return 获取1卡的号码
+     */
+    public String getLine1Number() {
+        return sTelephonyManager.getLine1Number();//获取本机号码
+    }
+
+    /**
      * @return 唯一的设备ID： 得到的是null
      * GSM手机的 IMEI 和 CDMA手机的 MEID.
      */
