@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tab_config_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorSecondary"
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:id="@+id/monitor_container"
+            style="@style/ConfigLv1ContainerStyle"
+            >
+
+            <TextView
+                android:id="@+id/monitor_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/ic_phone_analysis_72px"
+                android:gravity="center_vertical"
+                android:text="Event monitoring"
+                />
+
+            <View
+                android:id="@+id/line_lv2_monitor_top"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_height="1dp"
+                android:layout_below="@+id/monitor_title"
+                />
+
+            <TextView
+                android:id="@+id/tomb_stone_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_tomb_stone"
+                android:layout_alignTop="@+id/sb_md_tomb_stone"
+                android:layout_toLeftOf="@+id/sb_md_tomb_stone"
+                android:text="TombStone"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_tomb_stone"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_top"/>
+
+            <View
+                android:id="@+id/line_lv2_monitor_1"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sb_md_tomb_stone"
+                />
+
+            <TextView
+                android:id="@+id/anr_system_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_anr_system"
+                android:layout_alignTop="@+id/sb_md_anr_system"
+                android:layout_toLeftOf="@+id/sb_md_anr_system"
+                android:text="ANR-System"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_anr_system"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_1"/>
+
+            <View
+                android:id="@+id/line_lv2_monitor_2"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sb_md_anr_system"
+                />
+
+
+            <TextView
+                android:id="@+id/anr_data_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_anr_data"
+                android:layout_alignTop="@+id/sb_md_anr_data"
+                android:layout_toLeftOf="@+id/sb_md_anr_data"
+                android:text="ANR-Data"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_anr_data"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_2"/>
+
+
+            <View
+                android:id="@+id/line_lv2_monitor_3"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/sb_md_anr_data"
+                />
+
+            <TextView
+                android:id="@+id/reboot_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_reboot"
+                android:layout_alignTop="@+id/sb_md_reboot"
+                android:layout_toLeftOf="@+id/sb_md_reboot"
+                android:text="Framework Reboot"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_reboot"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_3"/>
+
+            <View
+                android:id="@+id/line_lv2_monitor_4"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sb_md_reboot"
+                />
+
+            <TextView
+                android:id="@+id/reset_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_reset"
+                android:layout_alignTop="@+id/sb_md_reset"
+                android:layout_toLeftOf="@+id/sb_md_reset"
+                android:text="Subsystem Reset"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_reset"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_4"/>
+
+            <View
+                android:id="@+id/line_lv2_monitor_5"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sb_md_reset"
+                />
+
+
+            <TextView
+                android:id="@+id/crash_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_md_crash"
+                android:layout_alignTop="@+id/sb_md_crash"
+                android:layout_toLeftOf="@+id/sb_md_crash"
+                android:text="Crash Collection"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_crash"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_5"/>
+
+            <View
+                android:id="@+id/line_lv2_monitor_bottom"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_below="@+id/sb_md_crash"
+                />
+
+
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/reports_container"
+            style="@style/ConfigLv1ContainerStyle"
+            >
+
+            <TextView
+                android:id="@+id/android_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/ic_android_72px"
+                android:gravity="center_vertical"
+                android:text="Reports"
+                android:layout_alignBottom="@+id/sb_md_android"
+                android:layout_alignTop="@+id/sb_md_android"
+                android:layout_toLeftOf="@+id/sb_md_android"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_md_android"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:visibility="invisible"
+                android:layout_alignParentRight="true"
+                />
+
+            <View
+                android:id="@+id/line_lv2_android_top"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_below="@+id/sb_md_android"
+                />
+
+
+            <TextView
+                android:id="@+id/radio_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/cp_btn_meminfo"
+                android:layout_alignTop="@+id/cp_btn_meminfo"
+                android:layout_toLeftOf="@+id/cp_btn_meminfo"
+                android:text="Meminfo"
+                />
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/cp_btn_meminfo"
+                android:layout_below="@+id/line_lv2_android_top"
+                style="@style/MonitorCPBtnStyle"
+                />
+
+
+            <View
+                android:id="@+id/line_lv2_android_1"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/cp_btn_meminfo"
+                />
+
+
+            <TextView
+                android:id="@+id/events_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/cp_btn_prop"
+                android:layout_alignTop="@+id/cp_btn_prop"
+                android:layout_toLeftOf="@+id/cp_btn_prop"
+                android:text="Prop"
+                />
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/cp_btn_prop"
+                android:layout_below="@+id/line_lv2_android_1"
+                style="@style/MonitorCPBtnStyle"
+                />
+            <com.kyleduo.switchbutton.SwitchButton
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:visibility="invisible"
+                android:layout_below="@+id/line_lv2_android_1"
+                />
+
+
+            <View
+                android:id="@+id/line_lv2_android_2"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/cp_btn_prop"
+                />
+
+
+            <TextView
+                android:id="@+id/tcp_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/cp_btn_dumpsys"
+                android:layout_alignTop="@+id/cp_btn_dumpsys"
+                android:layout_toLeftOf="@+id/cp_btn_dumpsys"
+                android:text="Dumpsys"
+                />
+
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/cp_btn_dumpsys"
+                android:layout_below="@+id/line_lv2_android_2"
+                style="@style/MonitorCPBtnStyle"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                style="@style/SwitchButtonStyleMD"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                />
+
+            <View
+                android:id="@+id/line_lv2_report_3"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/cp_btn_dumpsys"
+                />
+            <TextView
+                android:id="@+id/cpu_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/cp_btn_cpu"
+                android:layout_alignTop="@+id/cp_btn_cpu"
+                android:layout_toLeftOf="@+id/cp_btn_cpu"
+                android:text="CpuInfo"
+                />
+
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/cp_btn_cpu"
+                android:layout_below="@+id/line_lv2_report_3"
+                style="@style/MonitorCPBtnStyle"
+                />
+                        <View
+                android:id="@+id/line_lv2_report_4"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/cp_btn_cpu"
+                />
+            <TextView
+                android:id="@+id/sf_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/cp_btn_sf"
+                android:layout_alignTop="@+id/cp_btn_sf"
+                android:layout_toLeftOf="@+id/cp_btn_sf"
+                android:text="Surface Flinger"
+                />
+
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/cp_btn_sf"
+                android:layout_below="@+id/line_lv2_report_4"
+                style="@style/MonitorCPBtnStyle"
+                />
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>
+

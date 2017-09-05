@@ -71,9 +71,11 @@ public class CompressAppendixService extends Service {
         extras.putInt(START_ID, startId);
         mContext = this;
 
+//        mCYLog.debug("74---------startCommand");
         genZip(extras);
 
-        return Service.START_REDELIVER_INTENT;
+        return Service.START_NOT_STICKY;
+//        return Service.START_REDELIVER_INTENT; //重启服务导致多次上传
     }
 
     /**
@@ -438,10 +440,10 @@ public class CompressAppendixService extends Service {
                         zipAllFile.delete();
                     } else {
 
-                        if (zipAllFile.length() >= mSize10M * 5) {
+                        if (zipAllFile.length() >= mSize10M * 10) {
                             if (mUploadListener != null) {
                                 mUploadListener.onFail();
-                                mUploadListener.sendMsg(ApiConstants.FILE_TOO_MAX_CODE, "文件大于50M,无法上传服务器");
+                                mUploadListener.sendMsg(ApiConstants.FILE_TOO_MAX_CODE, "文件大于100M,无法上传服务器");
                                 zipAllFile.delete();
                             }
                             return;

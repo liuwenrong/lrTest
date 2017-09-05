@@ -28,6 +28,10 @@ import static android.support.v4.os.AsyncTaskCompat.executeParallel;
 
 public class QxdmSettingActivity extends CloudBaseActivity {
     public static final String Type_Modem = "Modem";
+    public static final String Type_WLAN = "wlan";
+    public static final String Type_GPS = "gps";
+    public static final String Type_AUDIO = "Audio";
+    public static final String Type_SENSOR = "sensor";
     private static final String Type_DataCall = "DataCall";
     public static final String Type_IMSTEST = "IMStest";
     public static final String Type_IRAT = "IRAT";
@@ -35,10 +39,7 @@ public class QxdmSettingActivity extends CloudBaseActivity {
     public static final String Type_RF = "RF";
     private static final String Type_UIM = "UIM";
     private static final String Type_VoiceCall = "VoiceCall";
-    public static final String Type_WLAN = "wlan";
-    public static final String Type_GPS = "gps";
-    public static final String Type_AUDIO = "Audio";
-    public static final String Type_SENSOR = "sensor";
+
 
 
     public static final String Type_Mdlog = "mdlog";

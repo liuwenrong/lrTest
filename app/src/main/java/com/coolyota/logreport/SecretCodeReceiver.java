@@ -15,8 +15,12 @@ public class SecretCodeReceiver extends BroadcastReceiver {
             return;
         }
 
-        if ("2017".equals(intent.getData().getHost())){
-            context.startActivity(LogSettingActivity.getLaunchIntent(context));
+        if ("900".equals(intent.getData().getHost())){
+//            context.startActivity(LogSettingActivity.getLaunchIntent(context));
+
+            Intent intentServer = new Intent(context, MainActivity.class);
+//            Intent intentServer = new Intent(context, LogSettingActivity.class);
+            context.startActivity(intentServer);
         } else if("2018".equals(intent.getData().getHost())){
 //            context.startActivity(ServerSettingActivity.getLaunchIntent(context));
             Intent intentServer = new Intent(context, ServerSettingActivity.class);

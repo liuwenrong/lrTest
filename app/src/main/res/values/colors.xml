@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#393A3F</color>
+<!--    <color name="colorPrimary">#2196F3</color>-->
+<!--    <color name="colorPrimaryDark">#1976D2</color>-->
+    <color name="colorPrimaryDark">#303135</color>
+<!--    强调色,按钮勾选时的颜色 光标颜色-->
     <color name="colorAccent">#FF4081</color>
+<!--    <color name="colorAccent">#fcfcfc</color>-->
+    <color name="colorSecondary">#757575</color>
+    <color name="colorWindowBackground">#757575</color>
+    <color name="colorThirdly">#fcfcfc</color>
+
+    <color name="textColorPrimary">#212121</color>
+    <color name="textColorSecondary">#999</color>
+<!--    <color name="textColorSecondary">#757575</color>-->
+    <color name="dividerColor">#bdbdbd</color>
 
     <color name="color_1E000000">#1E000000</color>
     <color name="color_FF1BC1FF">#FF1BC1FF</color>
@@ -21,4 +33,5 @@
     <color name="btn_info_pressed">#FF0065B3</color>
     <color name="btn_info">#FF1BC1FF</color>
     <color name="white">#fff</color>
+    <color name="trans">#0000</color>
 </resources>

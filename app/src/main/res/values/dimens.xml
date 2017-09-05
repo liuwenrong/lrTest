@@ -8,4 +8,10 @@
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="btn_rounded_corner_radius">5dp</dimen>
+    <dimen name="dimen_paddingLeft_config_level2">30dp</dimen>
+    <dimen name="dimen_paddingLeft_primary_text">20dp</dimen>
+    <dimen name="dimen_config_margin">3dp</dimen>
+    <dimen name="dimen_add_pic_height">65dp</dimen>
+    <dimen name="dimen_delete_margin">45dp</dimen>
+    <dimen name="dimen_manage_file_head_img">36dp</dimen>
 </resources>

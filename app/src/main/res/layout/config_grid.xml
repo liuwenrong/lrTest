@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ConfigLv1ContainerStyle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:orientation="horizontal"
+    >
+
+    <com.coolyota.logreport.ui.CheckLinearLayout
+        android:id="@+id/config_default"
+        style="@style/ConfigGridStyle"
+        >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/ic_android_72px"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Default"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            />
+
+    </com.coolyota.logreport.ui.CheckLinearLayout>
+
+    <com.coolyota.logreport.ui.CheckLinearLayout
+        android:id="@+id/config_Modem"
+        style="@style/ConfigGridStyle"
+        >
+<ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/ic_wifi_tethering_black_24dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modem"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            />
+    </com.coolyota.logreport.ui.CheckLinearLayout>
+
+    <com.coolyota.logreport.ui.CheckLinearLayout
+        android:id="@+id/config_IMS"
+        style="@style/ConfigGridStyle"
+        >
+<ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/cpu_72px"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="IMS"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            />
+    </com.coolyota.logreport.ui.CheckLinearLayout>
+
+    <LinearLayout
+        android:layout_width="1dp"
+        android:layout_height="500dp">
+
+    </LinearLayout>
+
+</LinearLayout>

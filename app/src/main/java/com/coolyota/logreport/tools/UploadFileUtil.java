@@ -50,6 +50,7 @@ public class UploadFileUtil {
 
     private static final String TAG = "UploadFileUtil";
     private static final int TIME_OUT = 60 * 1000; //超时时间
+    private static final int TIME_OUT_OK = 50; //OkHttp超时时间,单位s秒
     private static final String CHARSET = "utf-8"; //设置编码
     private static final String PREFIX = "--";
     private static final String LINE_END = "\n";
@@ -118,7 +119,9 @@ public class UploadFileUtil {
                         String msg = jsonObj.getString("msg");
                         if (code == ApiConstants.SUCCESS_CODE) {
 
+                            //成功 后先关闭开关在打开
                             callBackToService.sendMsg(ApiConstants.SUCCESS_CODE, "上传到服务器" + msg);
+                            // 然后删除已经上传的文件
                             callBackToService.onSuccessInUiThread();
                         } else if (code == ApiConstants.TOKEN_CODE) {
 
@@ -214,7 +217,10 @@ public class UploadFileUtil {
             RequestBody body = builder.build();
             //创建Request
             final Request request = new Request.Builder().url(urlMD5).post(body).build();
-            final Call call = mOkHttpClient.newBuilder().writeTimeout(50, TimeUnit.SECONDS).build().newCall(request);
+            final Call call = mOkHttpClient.newBuilder().writeTimeout(TIME_OUT_OK, TimeUnit.SECONDS)
+                    .readTimeout(TIME_OUT_OK, TimeUnit.SECONDS)
+                    .connectTimeout(TIME_OUT_OK, TimeUnit.SECONDS)
+                    .build().newCall(request);
             // enqueue异步方法,子线程
             call.enqueue(new Callback() {
                 @Override

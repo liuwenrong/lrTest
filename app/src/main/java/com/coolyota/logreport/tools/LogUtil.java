@@ -119,6 +119,23 @@ public class LogUtil {
         deploySwitchLogFileTask();
     }
 
+    public LogUtil(Context ctx) {
+        init(ctx);
+    }
+
+//    private static LogUtil mLogUtil;
+//
+//    public static LogUtil getInstance(Context ctx) {
+//        if (mLogUtil == null) {
+//            synchronized (mLogUtil) {
+//                if (mLogUtil == null) {
+//                    mLogUtil = new LogUtil(ctx);
+//                }
+//            }
+//        }
+//        return mLogUtil;
+//    }
+
     public static void startLog() {
         new LogCollectorThread().start();
     }
@@ -183,6 +200,8 @@ public class LogUtil {
             }
         }.start();
     }
+
+
 
     /**
      * 创建日志目录
@@ -583,7 +602,7 @@ public class LogUtil {
     }
 
     @NonNull
-    private static FileOutputStream writeToFile(File target, InputStream in) throws IOException {
+    public static FileOutputStream writeToFile(File target, InputStream in) throws IOException {
         FileOutputStream out = new FileOutputStream(target);
         byte[] buffer = new byte[8 * 1024];
         int count;

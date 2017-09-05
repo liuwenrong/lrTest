@@ -3,9 +3,11 @@
     <words>
       <w>batterystats</w>
       <w>betareport</w>
+      <w>btns</w>
       <w>bugreport</w>
       <w>cdma</w>
       <w>coolyota</w>
+      <w>cpuinfo</w>
       <w>datacall</w>
       <w>dcard</w>
       <w>dcss</w>
@@ -15,6 +17,7 @@
       <w>dumpstate</w>
       <w>filepaths</w>
       <w>fileprovider</w>
+      <w>flinger</w>
       <w>getprop</w>
       <w>hmmss</w>
       <w>imstest</w>

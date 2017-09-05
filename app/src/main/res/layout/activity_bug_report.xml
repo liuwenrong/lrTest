@@ -20,7 +20,7 @@
             android:background="@drawable/profile_item_bg_color_selector">
 
             <TextView
-                style="@style/TextTitleStyle"
+                style="@style/PrimaryTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -126,7 +126,7 @@
         </LinearLayout>-->
 
         <TextView
-            style="@style/TextTitleStyle"
+            style="@style/PrimaryTextStyle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginTop="12dp"
@@ -203,7 +203,7 @@
         </RelativeLayout>
 
         <TextView
-            style="@style/TextTitleStyle"
+            style="@style/PrimaryTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginTop="12dp"
@@ -294,7 +294,7 @@
 
         <CheckBox
             android:id="@+id/check_reboot"
-            style="@style/TextTitleStyle"
+            style="@style/PrimaryTextStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_common_height"
             android:layout_marginTop="12dp"

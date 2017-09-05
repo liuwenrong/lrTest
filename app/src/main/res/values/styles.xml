@@ -6,14 +6,62 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColor">#000</item>
+        <item name="titleTextColor">#fff</item>
+        <item name="android:height">20dp</item>
+        <item name="android:windowTitleSize">10sp</item>
+        <item name="android:titleTextStyle">@style/ActionBarTextTitleStyle</item>
     </style>
+
+    <style name="ActivityNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="titleTextColor">#fff</item>
+        <item name="android:labelTextSize">10sp</item>
+        <item name="android:keyTextSize">20sp</item>
+        <item name="android:windowTitleSize">10sp</item>
+        <item name="android:subtitleTextColor">#fff</item>
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="android:textSize">12sp</item>
+
+    </style>
+
+    <!-- 设置Toolbar标题字体的大小 -->
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- 设置Toolbar标题字体的大小 -->
+    <style name="Toolbar.SubTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+<!--    <item name="actionBarStyle">@style/ActionBarStyle</item>-->
 
     <style name="Dialog" parent="Base.Theme.AppCompat.Dialog">
 
     </style>
-    <style name="TextTitleStyle" parent="TextAppearance.AppCompat.Medium">
+    <style name="ActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:height">20dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">#00f</item>
+    </style>
+    <style name="ActionBarTextTitleStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">#00f</item>
+    </style>
+
+    <style name="PrimaryTextStyle" parent="TextAppearance.AppCompat.Medium">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">#DE000000</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/dimen_paddingLeft_primary_text</item>
     </style>
 
     <style name="TextContentAppearanceSmall" parent="@style/TextAppearance.AppCompat.Small">
@@ -37,6 +85,87 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="StyleTitleText">
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textColor">#444444</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SwitchButtonStyle">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <style name="SwitchButtonStyleMD" parent="SwitchButtonMD">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">1dp</item>
+        <item name="android:paddingBottom">1dp</item>
+    </style>
+
+    <style name="ConfigLv1ContainerStyle">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:layout_margin">@dimen/dimen_config_margin</item>
+        <item name="android:background">@drawable/bg_corners_5dp_solid_white</item>
+    </style>
+    <style name="ConfigLv2TitleStyle">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/dimen_paddingLeft_config_level2</item>
+    </style>
+
+
+    <style name="HomeLineStyle">
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:background">@color/dividerColor</item>
+        <item name="android:layout_height">0.3dp</item>
+    </style>
+
+    <style name="ConfigLv2LineStyle">
+        <item name="android:layout_marginLeft">@dimen/dimen_paddingLeft_config_level2</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:background">@color/dividerColor</item>
+        <item name="android:layout_height">0.3dp</item>
+    </style>
+
+    <style name="ConfigGridStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">90dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:checkable">true</item>
+        <item name="android:enabled">true</item>
+        <item name="android:background">@drawable/selector_config_grid</item>
+
+    </style>
+
+    <style name="MonitorCPBtnStyle">
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:background">@color/dividerColor</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="cpb_cornerRadius">5dp</item>
+        <item name="cpb_iconComplete">@drawable/ic_action_accept</item>
+        <item name="cpb_iconError">@drawable/ic_action_cancel</item>
+        <item name="android:text">Run Command</item>
+        <item name="cpb_textIdle">Run Command</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
 </resources>

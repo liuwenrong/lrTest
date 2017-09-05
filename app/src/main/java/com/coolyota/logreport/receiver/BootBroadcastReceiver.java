@@ -3,9 +3,6 @@ package com.coolyota.logreport.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-
-import com.coolyota.logreport.service.LogSizeService;
 
 /**
  * des:
@@ -17,10 +14,9 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.e("TAG", "18---开机自动服务自动启动.....");
         //后边的XXX.class就是要启动的服务
-        Intent service = new Intent(context, LogSizeService.class);
-        context.startService(service);
+//        Intent service = new Intent(context, LogSizeService.class);
+//        context.startService(service);
         //启动应用，参数为需要自动启动的应用的包名
 /*        Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
         context.startActivity(intent );*/

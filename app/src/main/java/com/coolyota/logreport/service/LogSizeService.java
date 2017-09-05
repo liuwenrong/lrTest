@@ -46,7 +46,7 @@ public class LogSizeService extends Service {
                 LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
             }
 //            Log.e(TAG, "43-----------handleMessage: begin");
-            long folderSize = FileUtil.getFolderSize(new File(LOG_PATH_SDCARD_DIR));
+            long folderSize = FileUtil.getFileOrFolderSize(new File(LOG_PATH_SDCARD_DIR));
 //            Log.e(TAG, "44----handleMessage: folderSize = " + folderSize );
 
             if (folderSize > FileUtil.LOG_FILE_MAX_SIZE) {

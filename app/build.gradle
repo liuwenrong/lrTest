@@ -2,12 +2,29 @@ apply plugin: 'com.android.application'
 
 
 android {
+//    signingConfigs {
+//        config {
+//            keyPassword 'android'
+//            storeFile file('D:/Android/0workSpacesAS/coolyotaY3/logreport/app/debug.keystore-platform')
+//            storePassword 'android'
+//            keyAlias 'androiddebugkey'
+//        }
+//    }
+
     signingConfigs {
-        config {
-            keyPassword 'android'
-            storeFile file('D:/Android/0workSpacesAS/coolyotaY3/logreport/app/debug.keystore-platform')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
+        debug {
+            storeFile file('../keystore/platform.jks')
+        }
+    }
+
+    signingConfigs {
+        keyConfig {
+            keyAlias 'baoliyota'
+            keyPassword '88888888'
+            storeFile file('../keystore/mykey_new.store')
+            storePassword 'password'
+//            v2SigningEnabled true
+//            v1SigningEnabled false
         }
     }
     compileSdkVersion 25
@@ -19,8 +36,8 @@ android {
     }
     defaultConfig {
         applicationId "com.coolyota.logreport"
-        minSdkVersion 22
-        targetSdkVersion 22
+        minSdkVersion 23
+        targetSdkVersion 23
         versionCode 1
         versionName "0.01"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -34,7 +51,8 @@ android {
             minifyEnabled false //是否开启混淆
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             //混淆文件位置
-                signingConfig signingConfigs.config
+//                signingConfig signingConfigs.config
+            signingConfig signingConfigs.keyConfig
             lintOptions {
                 checkReleaseBuilds false
                 // Or, if you prefer, you can continue to check for errors in release builds,
@@ -88,10 +106,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+//    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.github.dmytrodanylyk.circular-progress-button:library:1.1.3'
+    compile 'com.kyleduo.switchbutton:library:1.4.6'
    /* compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:preference-v14:25.3.1'*/
 }
