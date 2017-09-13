@@ -44,7 +44,7 @@ import com.coolyota.logreport.constants.ApiConstants;
 import com.coolyota.logreport.constants.CYConstants;
 import com.coolyota.logreport.service.LogSizeService;
 import com.coolyota.logreport.tools.AccountNameMask;
-import com.coolyota.logreport.tools.CompressAppendixService;
+import com.coolyota.logreport.service.CompressAppendixService;
 import com.coolyota.logreport.tools.ImageDecoder;
 import com.coolyota.logreport.tools.LogUtil;
 import com.coolyota.logreport.tools.NetUtil;
@@ -113,8 +113,8 @@ public class LogSettingActivity extends CloudBaseActivity {
             }
             mBtnLastClick = System.currentTimeMillis();
             Toast.makeText(LogSettingActivity.this, "状态信息已存至sdcard/yota_log目录下", Toast.LENGTH_SHORT).show();
-            LogUtil.init(LogSettingActivity.this);
-            LogUtil.startLog();
+//            LogUtil.init(LogSettingActivity.this);
+//            LogUtil.startLog();
         }
     };
     TextView tvDownloadSize;
@@ -270,7 +270,7 @@ public class LogSettingActivity extends CloudBaseActivity {
 
         mTvMsg = (TextView) findViewById(R.id.tv_msg);
 
-        startLogSizeService();
+//        startLogSizeService();
     }
 
     private void startLogSizeService() {

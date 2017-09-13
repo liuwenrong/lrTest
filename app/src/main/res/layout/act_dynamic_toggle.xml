@@ -30,14 +30,14 @@
             <TextView
                 android:id="@+id/modem_title"
                 style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_modem"
-                android:layout_alignTop="@+id/sb_md_modem"
-                android:layout_toLeftOf="@+id/sb_md_modem"
-                android:text="Verbose"
+                android:layout_alignBottom="@+id/sb_input"
+                android:layout_alignTop="@+id/sb_input"
+                android:layout_toLeftOf="@+id/sb_input"
+                android:text="Input"
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_modem"
+                android:id="@+id/sb_input"
                 style="@style/SwitchButtonStyleMD"
                 android:layout_width="wrap_content"
                 android:layout_height="10dp"
@@ -48,20 +48,20 @@
                 android:id="@+id/line_lv2_1"
                 style="@style/ConfigLv2LineStyle"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_modem"
+                android:layout_below="@+id/sb_input"
                 />
 
             <TextView
                 android:id="@+id/gps_title"
                 style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_gps"
-                android:layout_alignTop="@+id/sb_md_gps"
-                android:layout_toLeftOf="@+id/sb_md_gps"
-                android:text="Debug"
+                android:layout_alignBottom="@+id/sb_power"
+                android:layout_alignTop="@+id/sb_power"
+                android:layout_toLeftOf="@+id/sb_power"
+                android:text="Power"
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_gps"
+                android:id="@+id/sb_power"
                 style="@style/SwitchButtonStyleMD"
                 android:layout_width="wrap_content"
                 android:layout_height="10dp"
@@ -72,16 +72,17 @@
                 android:id="@+id/line_lv2_2"
                 style="@style/ConfigLv2LineStyle"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_gps"
+                android:layout_below="@+id/sb_power"
                 />
 
+<!--
             <TextView
                 android:id="@+id/wlan_title"
                 style="@style/ConfigLv2TitleStyle"
                 android:layout_alignBottom="@+id/sb_md_wlan"
                 android:layout_alignTop="@+id/sb_md_wlan"
                 android:layout_toLeftOf="@+id/sb_md_wlan"
-                android:text="Info"
+                android:text=""
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
@@ -105,7 +106,7 @@
                 android:layout_alignBottom="@+id/sb_md_audio"
                 android:layout_alignTop="@+id/sb_md_audio"
                 android:layout_toLeftOf="@+id/sb_md_audio"
-                android:text="Warn"
+                android:text=""
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
@@ -128,7 +129,7 @@
                 android:layout_alignBottom="@+id/sb_md_sensor"
                 android:layout_alignTop="@+id/sb_md_sensor"
                 android:layout_toLeftOf="@+id/sb_md_sensor"
-                android:text="Error"
+                android:text=""
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
@@ -138,14 +139,55 @@
                 android:layout_height="10dp"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/line_lv2_4"/>
+-->
 
             <View
                 android:id="@+id/line_lv2_5"
                 style="@style/ConfigLv2LineStyle"
                 android:layout_height="4dp"
                 android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_sensor"
+                android:layout_below="@+id/sb_power"
                 />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/android_container"
+            style="@style/ConfigLv1ContainerStyle"
+            android:visibility="visible"
+            >
+
+        <TextView
+            android:id="@+id/android_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/log_level"
+            android:layout_alignTop="@+id/log_level"
+            android:layout_toLeftOf="@+id/log_level"
+            android:drawableLeft="@mipmap/ic_android_72px"
+            android:gravity="center_vertical"
+            android:text="Log开关等级"
+            />
+
+        <TextView
+            android:id="@+id/log_level"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:padding="5dp"
+            android:text="Debug"
+            android:drawableRight="@drawable/ic_keyboard_arrow_down_black_24dp"
+            android:layout_alignParentRight="true"
+            />
+
+        <View
+            android:id="@+id/line_lv2_android_top"
+            style="@style/ConfigLv2LineStyle"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/log_level"
+            />
         </RelativeLayout>
 
     </LinearLayout>

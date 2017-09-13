@@ -243,7 +243,7 @@ public class UploadFileUtil {
     }
 
     /**
-     * 创建带进度的RequestBody
+     * 创建带进度的RequestBody 请求体
      *
      * @param contentType MediaType
      * @param file        准备上传的文件
@@ -280,8 +280,8 @@ public class UploadFileUtil {
 
                         final long finalSum = current;
                         long curTime = System.currentTimeMillis();
-                        //每200毫秒刷新一次数据
-                        if (curTime - lastRefreshUiTime >= 200 || current == remaining) {
+                        //每20毫秒刷新一次数据
+                        if (curTime - lastRefreshUiTime >= 20 || current == remaining) {
                             //计算下载速度
                             long diffTime = (curTime - lastRefreshUiTime) / 1000;
                             if (diffTime == 0) diffTime += 1;
@@ -289,8 +289,6 @@ public class UploadFileUtil {
                             final long networkSpeed = diffBytes / diffTime;
 
                             progressCallBack(remaining, current, networkSpeed, callBack);
-//                                    callback.downloadProgress(finalSum, total, finalSum * 1.0f / total, networkSpeed);   //进度回调的方法
-
 
                             lastRefreshUiTime = System.currentTimeMillis();
                             lastWriteBytes = finalSum;
@@ -301,6 +299,7 @@ public class UploadFileUtil {
                     e.printStackTrace();
                 }
             }
+
         };
     }
 
@@ -441,11 +440,22 @@ public class UploadFileUtil {
 
     }
 
+    /**
+     * 请求体的进度,用于上传
+     * @param <T>
+     */
     public interface ReqProgressCallBack<T> extends ReqCallBack<T> {
         /**
          * 响应进度更新 在UI线程
          */
         void onProgressInUIThread(long total, long current, float progress, long networkSpeed);
+    }
+
+    /**
+     * 响应体进度回调接口，比如用于文件下载中
+     */
+    public interface ProgressResponseListener {
+        void onResponseProgress(long bytesRead, long contentLength, boolean done);
     }
 
     public interface ReqCallBack<T> {

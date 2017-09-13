@@ -54,6 +54,14 @@ public class ApiConstants {
      */
     public static final int OTHER_CODE = 105;
     /**
+     * 压缩完成后开始上传
+     */
+    public static final int START_Upload = 110;
+    /**
+     * 压缩完成后用户取消上传
+     */
+    public static final int User_Cancel_Upload = 111;
+    /**
      * 上传路径
      */
     public static final String PATH_UPLOAD = BASE_URL + "/dcss-collector/log/upload";

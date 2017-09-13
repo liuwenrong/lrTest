@@ -11,9 +11,12 @@ public class AccountNameMask {
     private static final String STARS_LESS = "***";
 
     /**
-     * Regular expression for mobile number.
+     * Regular expression for mobile number.For China
      */
-    private static final String REG_EXP_MOBILE = "^((\\\\+86)|(86))?1[34578]\\d{9}$";
+//    private static final String REG_EXP_MOBILE = "^((\\+86)|(86))?1[34578]\\d{9}$";
+//    private static final String REG_EXP_MOBILE = "^((\\+?86))?1[34578]\\d{9}$";
+    private static final String REG_EXP_MOBILE = "^((\\+?\\d?\\d))?1[34578]\\d{9}$";
+//  String m = "^((\\+{0,1}86){0,1})1[0-9]{10}"
     /**
      * Regular expression for email.
      */

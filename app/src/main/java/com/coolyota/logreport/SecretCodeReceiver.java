@@ -19,6 +19,7 @@ public class SecretCodeReceiver extends BroadcastReceiver {
 //            context.startActivity(LogSettingActivity.getLaunchIntent(context));
 
             Intent intentServer = new Intent(context, MainActivity.class);
+//            intentServer.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //            Intent intentServer = new Intent(context, LogSettingActivity.class);
             context.startActivity(intentServer);
         } else if("2018".equals(intent.getData().getHost())){

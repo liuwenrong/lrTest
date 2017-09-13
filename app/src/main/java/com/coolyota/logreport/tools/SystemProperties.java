@@ -18,6 +18,19 @@ public class SystemProperties {
         return def;
     }
 
+    public static int getInt(String key, int def) {
+
+        try {
+            Object obj = ReflectionCall.invoke(ReflectionCall.getMethod(Class.forName("android.os.SystemProperties"), "getInt",
+                    String.class, int.class), null, key, def);
+
+            return obj == null ? def : (Integer)(obj);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return def;
+    }
+
     public static void set(String key, String val) {
         try {
             ReflectionCall.invoke(ReflectionCall.getMethod(Class.forName("android.os.SystemProperties"),"set",

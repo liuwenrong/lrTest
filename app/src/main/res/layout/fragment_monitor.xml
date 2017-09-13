@@ -90,14 +90,14 @@
             <TextView
                 android:id="@+id/anr_data_title"
                 style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_anr_data"
-                android:layout_alignTop="@+id/sb_md_anr_data"
-                android:layout_toLeftOf="@+id/sb_md_anr_data"
-                android:text="ANR-Data"
+                android:layout_alignBottom="@+id/sb_crash_app"
+                android:layout_alignTop="@+id/sb_crash_app"
+                android:layout_toLeftOf="@+id/sb_crash_app"
+                android:text="CRASH_APP"
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_anr_data"
+                android:id="@+id/sb_crash_app"
                 style="@style/SwitchButtonStyleMD"
                 android:layout_width="wrap_content"
                 android:layout_height="10dp"
@@ -110,7 +110,7 @@
                 style="@style/ConfigLv2LineStyle"
                 android:layout_width="match_parent"
                 android:layout_marginTop="5dp"
-                android:layout_below="@+id/sb_md_anr_data"
+                android:layout_below="@+id/sb_crash_app"
                 />
 
             <TextView
@@ -161,30 +161,53 @@
                 android:layout_below="@+id/sb_md_reset"
                 />
 
-
             <TextView
                 android:id="@+id/crash_title"
                 style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_crash"
-                android:layout_alignTop="@+id/sb_md_crash"
-                android:layout_toLeftOf="@+id/sb_md_crash"
-                android:text="Crash Collection"
+                android:layout_alignBottom="@+id/sb_crash_system"
+                android:layout_alignTop="@+id/sb_crash_system"
+                android:layout_toLeftOf="@+id/sb_crash_system"
+                android:text="Crash System"
                 />
 
             <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_crash"
+                android:id="@+id/sb_crash_system"
                 style="@style/SwitchButtonStyleMD"
                 android:layout_width="wrap_content"
                 android:layout_height="10dp"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/line_lv2_monitor_5"/>
 
+                        <View
+                android:id="@+id/line_lv2_monitor_6"
+                style="@style/ConfigLv2LineStyle"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sb_crash_system"
+                />
+
+            <TextView
+                android:id="@+id/anr_app_title"
+                style="@style/ConfigLv2TitleStyle"
+                android:layout_alignBottom="@+id/sb_anr_app"
+                android:layout_alignTop="@+id/sb_anr_app"
+                android:layout_toLeftOf="@+id/sb_anr_app"
+                android:text="ANR_APP"
+                />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_anr_app"
+                style="@style/SwitchButtonStyleMD"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/line_lv2_monitor_6"/>
+
             <View
                 android:id="@+id/line_lv2_monitor_bottom"
                 style="@style/ConfigLv2LineStyle"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:layout_below="@+id/sb_md_crash"
+                android:layout_below="@+id/sb_anr_app"
                 />
 
 

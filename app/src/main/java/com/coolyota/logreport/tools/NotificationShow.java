@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
 
-import com.coolyota.logreport.LogSettingActivity;
+import com.coolyota.logreport.MainActivity;
 import com.coolyota.logreport.R;
 
 /**
@@ -30,7 +30,7 @@ public class NotificationShow {
                 .setOngoing(true)
                 .setShowWhen(true)
                 .setAutoCancel(false);
-        builder.setContentIntent(PendingIntent.getActivity(context, ID_SCREEN_RECORD, new Intent(context, LogSettingActivity.class), PendingIntent.FLAG_UPDATE_CURRENT |
+        builder.setContentIntent(PendingIntent.getActivity(context, ID_SCREEN_RECORD, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT |
                 PendingIntent.FLAG_UPDATE_CURRENT));
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(ID_LOG_RECORD, builder.build());
@@ -49,7 +49,7 @@ public class NotificationShow {
 //                .setOngoing(true)
                 .setShowWhen(true)
                 .setAutoCancel(true);
-        Intent intent = new Intent(context, LogSettingActivity.class);
+        Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(TYPE, ID_LOG_DELETE);
         builder.setContentIntent(PendingIntent.getActivity(context, ID_LOG_DELETE, intent, PendingIntent.FLAG_UPDATE_CURRENT |

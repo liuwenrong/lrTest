@@ -113,6 +113,12 @@
     <string name="setting">setting</string>
     <string name="select_all">select_all</string>
     <string name="switch_config">switch_config</string>
-
+    <string name="monitor_tomb_stone">检测到发生了TombStone,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_anr_system">检测到系统发生了ANR,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_crash_app">检测到App停止运行,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_framework_reboot">检测到系统重启,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_subsystem_reset">检测到系统重置,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_crash">检测到系统发生了Crash,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
+    <string name="monitor_anr_app">检测到应用发生了ANR,是否需要上传Log日志,以便帮助开发人员快速的解决问题?</string>
 
 </resources>

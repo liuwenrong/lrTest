@@ -24,20 +24,46 @@
         <!--                    android:name=".LogSettingActivity"-->
         <activity
             android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:noHistory="false"
+            android:excludeFromRecents="false"
             android:screenOrientation="portrait"
             android:theme="@style/ActivityNoActionBar"
-            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan|stateHidden">
+
             <intent-filter>
-                <action android:name="baoliyota.logreport"/>
+
+                <action android:name="baoliyota.logreport.main"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MonitorAct"
+            android:exported="true"
+            android:noHistory="false"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActivityTrans"
+            >
+
+            <intent-filter>
+
+                <action android:name="baoliyota.logreport"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+            </intent-filter>
+
         </activity>
 
         <!--<action android:name="android.intent.action.MAIN"/>-->
         <!--<category android:name="android.intent.category.LAUNCHER"/>-->
 
-        <activity android:name=".DynamicToggleActivity"
+        <activity
+            android:name=".DynamicToggleActivity"
             android:screenOrientation="portrait"
             >
 
@@ -55,11 +81,11 @@
 
         <!-- 监听开机广播 -->
         <!--<receiver android:name=".receiver.BootBroadcastReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
+        <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+        <!--</intent-filter>-->
         <!--</receiver>-->
 
         <!-- 暗码接收者 -->
@@ -80,7 +106,7 @@
         </receiver>
 
         <service
-            android:name=".tools.CompressAppendixService"
+            android:name=".service.CompressAppendixService"
             android:enabled="true"
             android:exported="true">
         </service>

@@ -2,10 +2,6 @@ package com.coolyota.logreport;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-
-import com.coolyota.logreport.receiver.TimeTickReceiver;
 
 /**
  * des:
@@ -17,20 +13,26 @@ public class CYLogReporterApplication extends Application {
 
     private static CYLogReporterApplication sApplication;
 
+    public static CYLogReporterApplication getInstance() {
+        return sApplication;
+    }
+
+    public static Context getContext() {
+        return sApplication;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+//        if (LeakCanary.isInAnalyzerProcess(this)) {
+//            return;
+//        }
+//        LeakCanary.install(this);
         sApplication = this;
-        IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
-        TimeTickReceiver receiver = new TimeTickReceiver();
-        registerReceiver(receiver, filter);
-    }
+        //目前不要监听Log大小弹通知,所以注释掉
+//        IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+//        TimeTickReceiver receiver = new TimeTickReceiver();
+//        registerReceiver(receiver, filter);
 
-    public static CYLogReporterApplication getInstance(){
-        return sApplication;
-    }
-
-    public static Context getContext(){
-        return sApplication;
     }
 }

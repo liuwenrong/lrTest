@@ -1,368 +1,379 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tab_config_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-    <LinearLayout
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/tab_config_scrollview_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorSecondary"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         >
 
-        <RelativeLayout
-            android:id="@+id/qxdm_container"
-            style="@style/ConfigLv1ContainerStyle"
-            android:visibility="visible"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorSecondary"
+            android:orientation="vertical"
             >
 
-            <TextView
-                android:id="@+id/qxdm_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/ic_wifi_tethering_black_24dp"
-                android:gravity="center_vertical"
-                android:text="QXDM"
-                />
+            <RelativeLayout
+                android:id="@+id/qxdm_container"
+                style="@style/ConfigLv1ContainerStyle"
+                android:visibility="visible"
+                >
 
-            <TextView
-                android:id="@+id/modem_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_modem"
-                android:layout_alignTop="@+id/sb_md_modem"
-                android:layout_toLeftOf="@+id/sb_md_modem"
-                android:text="Modem"
-                />
+                <TextView
+                    android:id="@+id/qxdm_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/ic_wifi_tethering_black_24dp"
+                    android:gravity="center_vertical"
+                    android:text="QXDM"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_modem"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/qxdm_title"/>
+                <TextView
+                    android:id="@+id/modem_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_modem"
+                    android:layout_alignTop="@+id/sb_md_modem"
+                    android:layout_toLeftOf="@+id/sb_md_modem"
+                    android:text="Modem"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_1"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_modem"
-                />
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_modem"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/qxdm_title"/>
 
-            <TextView
-                android:id="@+id/gps_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_gps"
-                android:layout_alignTop="@+id/sb_md_gps"
-                android:layout_toLeftOf="@+id/sb_md_gps"
-                android:text="GPS LOG"
-                />
+                <View
+                    android:id="@+id/line_lv2_1"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_modem"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_gps"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_1"/>
+                <TextView
+                    android:id="@+id/gps_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_gps"
+                    android:layout_alignTop="@+id/sb_md_gps"
+                    android:layout_toLeftOf="@+id/sb_md_gps"
+                    android:text="GPS LOG"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_2"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_gps"
-                />
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_gps"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_1"/>
 
-            <TextView
-                android:id="@+id/wlan_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_wlan"
-                android:layout_alignTop="@+id/sb_md_wlan"
-                android:layout_toLeftOf="@+id/sb_md_wlan"
-                android:text="WLAN LOG"
-                />
+                <View
+                    android:id="@+id/line_lv2_2"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_gps"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_wlan"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_2"/>
+                <TextView
+                    android:id="@+id/wlan_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_wlan"
+                    android:layout_alignTop="@+id/sb_md_wlan"
+                    android:layout_toLeftOf="@+id/sb_md_wlan"
+                    android:text="WLAN LOG"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_3"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_wlan"
-                />
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_wlan"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_2"/>
 
-            <TextView
-                android:id="@+id/audio_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_audio"
-                android:layout_alignTop="@+id/sb_md_audio"
-                android:layout_toLeftOf="@+id/sb_md_audio"
-                android:text="Audio"
-                />
+                <View
+                    android:id="@+id/line_lv2_3"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_wlan"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_audio"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_3"/>
-            <View
-                android:id="@+id/line_lv2_4"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_audio"
-                />
+                <TextView
+                    android:id="@+id/audio_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_audio"
+                    android:layout_alignTop="@+id/sb_md_audio"
+                    android:layout_toLeftOf="@+id/sb_md_audio"
+                    android:text="Audio"
+                    />
 
-            <TextView
-                android:id="@+id/sensor_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_sensor"
-                android:layout_alignTop="@+id/sb_md_sensor"
-                android:layout_toLeftOf="@+id/sb_md_sensor"
-                android:text="@string/sensor"
-                />
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_audio"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_3"/>
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_sensor"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_4"/>
+                <View
+                    android:id="@+id/line_lv2_4"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_audio"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_5"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_height="4dp"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_sensor"
-                />
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/sensor_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_sensor"
+                    android:layout_alignTop="@+id/sb_md_sensor"
+                    android:layout_toLeftOf="@+id/sb_md_sensor"
+                    android:text="@string/sensor"
+                    />
 
-        <RelativeLayout
-            android:id="@+id/analytics_container"
-            style="@style/ConfigLv1ContainerStyle"
-            android:visibility="gone"
-            >
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_sensor"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_4"/>
 
-            <TextView
-                android:id="@+id/analytics_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/ic_phone_analysis_72px"
-                android:gravity="center_vertical"
-                android:text="Analytics"
-                />
+                <View
+                    android:id="@+id/line_lv2_5"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_below="@+id/sb_md_sensor"
+                    />
+            </RelativeLayout>
 
-             <View
-                android:id="@+id/line_lv2_analytics_top"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_height="2dp"
-                android:layout_below="@+id/analytics_title"
-                />
+            <RelativeLayout
+                android:id="@+id/dump_container"
+                style="@style/ConfigLv1ContainerStyle"
+                android:visibility="visible"
+                >
 
-            <TextView
-                android:id="@+id/battery_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_battery"
-                android:layout_alignTop="@+id/sb_md_battery"
-                android:layout_toLeftOf="@+id/sb_md_battery"
-                android:text="Battery Analytics"
-                />
+                <TextView
+                    android:id="@+id/analytics_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/ic_phone_analysis_72px"
+                    android:gravity="center_vertical"
+                    android:text="Dump"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_battery"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_analytics_top"/>
+                <View
+                    android:id="@+id/line_lv2_analytics_top"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_below="@+id/analytics_title"
+                    android:layout_marginTop="5dp"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_analytics_1"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_battery"
-                />
+                <TextView
+                    android:id="@+id/battery_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_ramdumps"
+                    android:layout_alignTop="@+id/sb_ramdumps"
+                    android:layout_toLeftOf="@+id/sb_ramdumps"
+                    android:text="RamDumps"
+                    />
 
-            <TextView
-                android:id="@+id/cpu_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_cpu"
-                android:layout_alignTop="@+id/sb_md_cpu"
-                android:layout_toLeftOf="@+id/sb_md_cpu"
-                android:text="CPU Analytics"
-                />
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_ramdumps"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_analytics_top"/>
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_cpu"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_analytics_1"/>
+                <View
+                    android:id="@+id/line_lv2_analytics_1"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_ramdumps"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_analytics_2"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_cpu"
-                />
+                <TextView
+                    android:id="@+id/cpu_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_restart_level"
+                    android:layout_alignTop="@+id/sb_restart_level"
+                    android:layout_toLeftOf="@+id/sb_restart_level"
+                    android:text="Restart Level"
+                    />
 
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_restart_level"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_analytics_1"/>
 
-            <TextView
-                android:id="@+id/memory_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_memory"
-                android:layout_alignTop="@+id/sb_md_memory"
-                android:layout_toLeftOf="@+id/sb_md_memory"
-                android:text="Memory Analytics"
-                />
-
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_memory"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_analytics_2"/>
-
-            <View
-                android:id="@+id/line_lv2_analytics_3"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@+id/sb_md_memory"
-                />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/android_container"
-            style="@style/ConfigLv1ContainerStyle"
-            android:visibility="visible"
-            >
-
-            <TextView
-                android:id="@+id/android_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/ic_android_72px"
-                android:gravity="center_vertical"
-                android:text="Android"
-                android:layout_alignBottom="@+id/sb_md_android"
-                android:layout_alignTop="@+id/sb_md_android"
-                android:layout_toLeftOf="@+id/sb_md_android"
-                />
-
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_android"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                />
-
-            <View
-                android:id="@+id/line_lv2_android_top"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_below="@+id/sb_md_android"
-                />
+                <View
+                    android:id="@+id/line_lv2_analytics_2"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_restart_level"
+                    />
 
 
-            <TextView
-                android:id="@+id/radio_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_radio"
-                android:layout_alignTop="@+id/sb_md_radio"
-                android:layout_toLeftOf="@+id/sb_md_radio"
-                android:text="logcat radio"
-                />
+                <TextView
+                    android:id="@+id/memory_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_download_mode"
+                    android:layout_alignTop="@+id/sb_download_mode"
+                    android:layout_toLeftOf="@+id/sb_download_mode"
+                    android:text="Download Mode"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_radio"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_android_top"/>
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_download_mode"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_analytics_2"/>
 
+                <View
+                    android:id="@+id/line_lv2_analytics_3"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_below="@+id/sb_download_mode"
+                    />
 
-            <View
-                android:id="@+id/line_lv2_android_1"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_radio"
-                />
+            </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/android_container"
+                style="@style/ConfigLv1ContainerStyle"
+                android:visibility="visible"
+                >
 
-            <TextView
-                android:id="@+id/events_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_events"
-                android:layout_alignTop="@+id/sb_md_events"
-                android:layout_toLeftOf="@+id/sb_md_events"
-                android:text="logcat events"
-                />
+                <TextView
+                    android:id="@+id/android_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/sb_md_android"
+                    android:layout_alignTop="@+id/sb_md_android"
+                    android:layout_toLeftOf="@+id/sb_md_android"
+                    android:drawableLeft="@mipmap/ic_android_72px"
+                    android:gravity="center_vertical"
+                    android:text="Android"
+                    />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_events"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_android_1"/>
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_android"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    />
 
-
-            <View
-                android:id="@+id/line_lv2_android_2"
-                style="@style/ConfigLv2LineStyle"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/sb_md_events"
-                />
-
-
-            <TextView
-                android:id="@+id/tcp_title"
-                style="@style/ConfigLv2TitleStyle"
-                android:layout_alignBottom="@+id/sb_md_tcp"
-                android:layout_alignTop="@+id/sb_md_tcp"
-                android:layout_toLeftOf="@+id/sb_md_tcp"
-                android:text="TCPDump"
-                />
-
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_md_tcp"
-                style="@style/SwitchButtonStyleMD"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/line_lv2_android_2"/>
+                <View
+                    android:id="@+id/line_lv2_android_top"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_below="@+id/sb_md_android"
+                    />
 
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/radio_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_radio"
+                    android:layout_alignTop="@+id/sb_md_radio"
+                    android:layout_toLeftOf="@+id/sb_md_radio"
+                    android:text="logcat radio"
+                    />
 
-        <include layout="@layout/config_grid"
-            android:id="@+id/config_grid_container"
-            android:visibility="gone"
-            >
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_radio"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_android_top"/>
 
-        </include>
 
-    </LinearLayout>
+                <View
+                    android:id="@+id/line_lv2_android_1"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_radio"
+                    />
 
-</ScrollView>
+
+                <TextView
+                    android:id="@+id/events_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_events"
+                    android:layout_alignTop="@+id/sb_md_events"
+                    android:layout_toLeftOf="@+id/sb_md_events"
+                    android:text="logcat events"
+                    />
+
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_events"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignEnd="@+id/line_lv2_android_2"
+                    android:layout_below="@+id/line_lv2_android_1"/>
+
+
+                <View
+                    android:id="@+id/line_lv2_android_2"
+                    style="@style/ConfigLv2LineStyle"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/sb_md_events"
+                    />
+
+
+                <TextView
+                    android:id="@+id/tcp_title"
+                    style="@style/ConfigLv2TitleStyle"
+                    android:layout_alignBottom="@+id/sb_md_kernel"
+                    android:layout_alignTop="@+id/sb_md_kernel"
+                    android:layout_toLeftOf="@+id/sb_md_kernel"
+                    android:text="kernel"
+                    />
+
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_md_kernel"
+                    style="@style/SwitchButtonStyleMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/line_lv2_android_2"/>
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <include
+        android:id="@+id/config_grid_container"
+        layout="@layout/config_grid"
+        android:visibility="gone"
+        >
+
+    </include>
+
+</FrameLayout>

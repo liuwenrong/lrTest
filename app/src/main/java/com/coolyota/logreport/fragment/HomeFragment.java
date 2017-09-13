@@ -45,8 +45,8 @@ import com.coolyota.logreport.R;
 import com.coolyota.logreport.base.BaseFragment;
 import com.coolyota.logreport.constants.ApiConstants;
 import com.coolyota.logreport.constants.CYConstants;
+import com.coolyota.logreport.service.CompressAppendixService;
 import com.coolyota.logreport.tools.AccountNameMask;
-import com.coolyota.logreport.tools.CompressAppendixService;
 import com.coolyota.logreport.tools.ImageDecoder;
 import com.coolyota.logreport.tools.LogUtil;
 import com.coolyota.logreport.tools.NetUtil;
@@ -76,12 +76,17 @@ import static android.content.Context.BIND_AUTO_CREATE;
  */
 public class HomeFragment extends BaseFragment {
 
+    public static final String TAG = "HomeFragment";
     private static final int REQUEST_CODE_PERMISSION_ACCESS_FILE = 201;
     private static final int REQUEST_CODE_PERMISSION_READ_PHONE_STATE = 202;
     private static final int REQUEST_CODE_ACTIVITY_PICK_PHOTO = 103;
-    public static final String TAG = "HomeFragment";
     private static final int REQUEST_CODE_PERMISSION_ACCESS_PHONE = 203;
     private static String mMsg = "";
+    private static int mTabNameResId = R.string.home_tab_name;
+    public LinearLayout mProgressContainer;
+    public UploadServiceConn mUploadServiceConn;
+    public TextView mTvMsg;
+    public Intent mServiceIntent;
     SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss");
     TextView tvDownloadSize;
     TextView tvProgress;
@@ -91,12 +96,11 @@ public class HomeFragment extends BaseFragment {
     boolean mIsStartUpload = false;
     CustomDialog dialog;
     CustomDialog.Builder builder;
-    public LinearLayout mProgressContainer;
-    public UploadServiceConn mUploadServiceConn;
-    public TextView mTvMsg;
     CheckBox mRebootCheck;
     SwitchButton mSbReboot;
     long mBtnLastClick = 0; // 上一次提交按钮点击的时间
+    Handler mHandler = new Handler();
+    ScrollView mScrollView;
     private EditText mEditBugDetails;
     private ViewGroup mPicImageParent;
     private ViewGroup mDeletePicParent;
@@ -104,9 +108,7 @@ public class HomeFragment extends BaseFragment {
     private CircularProgressButton mBtnSubmit;
     private int mCurrentAddPic;
     private List<String> mPicImageList = new ArrayList<>();
-
-    private static int mTabNameResId = R.string.home_tab_name;
-
+    private View mShelter;
     View.OnClickListener mSubmitOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View buttonView) {
@@ -116,8 +118,9 @@ public class HomeFragment extends BaseFragment {
             }
             mBtnLastClick = System.currentTimeMillis();
 
-            if (mBtnSubmit.getProgress() == 0) {
+            if (mBtnSubmit.getProgress() == 0 || mBtnSubmit.getProgress() == -1) { //-1时重新上传
 
+                mBtnSubmit.setProgress(0);
                 showOrHideProgressAndCover(false, 1); //设为0时不会转
                 submitBugReport();
 
@@ -127,15 +130,15 @@ public class HomeFragment extends BaseFragment {
 
         }
     };
-    private View mShelter;
-    public Intent mServiceIntent;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         setHasOptionsMenu(true);    //保证能在Fragment里调用onCreateOptionsMenu()方法
-
+//        if (myService == null) {
+//            getContext().bindService(new Intent(getContext(), CompressAppendixService.class), mUploadServiceConn, BIND_AUTO_CREATE);
+//        }
         initView(view);
 
         return view;
@@ -191,7 +194,8 @@ public class HomeFragment extends BaseFragment {
         if (checkBugDesc(false) && checkUserContacts()) {
             doRealSubmitBugReport();
         } else {
-            showOrHideProgressAndCover(false, -1);
+            mBtnSubmit.setProgress(-1);
+            showOrHideProgressAndCover(false, 0);
         }
     }
 
@@ -210,7 +214,6 @@ public class HomeFragment extends BaseFragment {
         }
     }
 
-
     /**
      * 压缩 并 提交到服务器
      */
@@ -220,126 +223,65 @@ public class HomeFragment extends BaseFragment {
             Toast.makeText(getContext(), "当前网络不可用,请连上网络后再试.", Toast.LENGTH_LONG).show();
             mBtnSubmit.setVisibility(View.VISIBLE);
             mProgressContainer.setVisibility(View.GONE);
-//            mBtnSubmit.setInProgress((Activity) getContext(), false);
-//            mBtnSubmit.setProgress(-1);
             showOrHideProgressAndCover(false, -1);
             mIsStartUpload = false;
             return;
         }
 
-        if ( mServiceIntent != null) {
-            unBindAndStopService();
-        }
+//        if ( mServiceIntent != null) {
+//            unBindAndStopService();
+//        }
         mServiceIntent = new Intent(getContext(), CompressAppendixService.class);
 
 //        mServiceIntent.putExtra(CompressAppendixService.REBOOT_CHECKED_KEY, mRebootCheck.isChecked());
+        mServiceIntent.putExtra(CompressAppendixService.KEY_MONITOR_TYPE, mMonitorType);
         mServiceIntent.putExtra(CompressAppendixService.REBOOT_CHECKED_KEY, mSbReboot.isChecked());
         mServiceIntent.putExtra(CompressAppendixService.BUG_DETAILS, mEditBugDetails.getText().toString());
         mServiceIntent.putExtra(CompressAppendixService.USER_CONTACT, mEditContacts.getText().toString());
         mServiceIntent.putExtra(CompressAppendixService.PIC_IMAGE_LIST, mPicImageList.toArray(new String[mPicImageList.size()]));
 
         mUploadServiceConn = new UploadServiceConn();
-        getContext().bindService(mServiceIntent, mUploadServiceConn, BIND_AUTO_CREATE);
-        getContext().startService(mServiceIntent);
+        if (myService == null) {
+            mIsBind = getContext().bindService(mServiceIntent, mUploadServiceConn, BIND_AUTO_CREATE);
+        } else {
+            myService.startCompressAndUpload(mServiceIntent, getActivity());
+        }
+//        getContext().startService(mServiceIntent);
         mProgressContainer.setVisibility(View.VISIBLE);
 
     }
 
+    int mMonitorType = -1;
+
+    public void setMonitorType(int monitorType) {
+        mMonitorType = monitorType;
+    }
     @Override
     public int getTabNameResId() {
         return mTabNameResId;
     }
 
-    class UploadServiceConn implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            myService = ((CompressAppendixService.MyBinder) service).getMyService(); //获取MyService对象
-
-            /**
-             * 使用一个接口来实现回调，这样比上面方法更加灵活，推荐
-             */
-            myService.setUploadListener(new CompressAppendixService.UploadListener() {
-                @Override
-                public void updateBar(long totalSize, long currentSize, float progress, long networkSpeed) {
-
-                    if (!mIsStartUpload) {
-                        mProgressContainer.setVisibility(View.VISIBLE);
-                        mIsStartUpload = true;
-                        scrollToBottom();
-                        showOrHideProgressAndCover(true, 1);
-                    } else {
-
-                        if (totalSize == currentSize) { //上传完成
-
-                        }
-
-                    }
-                    String downloadLength = Formatter.formatFileSize(getContext(), currentSize);
-                    String totalLength = Formatter.formatFileSize(getContext(), totalSize);
-                    tvDownloadSize.setText(downloadLength + "/" + totalLength);
-                    String netSpeed = Formatter.formatFileSize(getContext(), networkSpeed);
-                    tvNetSpeed.setText(netSpeed + "/S");
-                    tvProgress.setText((Math.round(progress * 10000) * 1.0f / 100) + "%");
-                    pbProgress.setMax(100);
-                    pbProgress.setProgress((int) (progress * 100));
-                    mBtnSubmit.setProgress((int) (progress * 100));
-                    getDialog("上传到服务器成功");
-
-                }
-
-                @Override
-                public void onFail() {
-                    //上传失败
-                    getDialog("上传失败").show();
-//                    mBtnSubmit.setVisibility(View.VISIBLE);
-                    mProgressContainer.setVisibility(View.GONE);
-//                    mBtnSubmit.setInProgress((Activity) getContext(), false);
-//                    mBtnSubmit.setProgress(-1);
-                    showOrHideProgressAndCover(true, -1);
-                    mIsStartUpload = false;
-                }
-
-                @Override
-                public void sendMsg(int code, String msg) {
-                    if (code == ApiConstants.SUCCESS_CODE) {
-                        mProgressContainer.setVisibility(View.GONE);
-//                        mBtnSubmit.setInProgress((Activity) getContext(), false);
-                        showOrHideProgressAndCover(true, 100);
-                        mIsStartUpload = false;
-//                        mYotaLogSwitch.setChecked(false);
-
-                        //如果 log开关已经打开,那么先关闭,在重新打开,防止文件删除后 log不记录的情况
-                        if ("true".equals(SystemProperties.get(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false"))) {
-                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false");
-                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "true");
-                        }
-
-                    }
-                    showAndSaveMsg(code, msg);
-                }
-            });
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    }
-
+    boolean mIsBind;
     private void unBindAndStopService() {
 //        if (mServiceIntent != null)
-        getContext().stopService(mServiceIntent);
-        getContext().unbindService(mUploadServiceConn);
+//        getContext().stopService(mServiceIntent);
+        if (mUploadServiceConn != null && mIsBind) {
+            try {
+                getContext().unbindService(mUploadServiceConn);
+                mIsBind = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
-
 
     public boolean onBackPressed() {
         if (mEditBugDetails == null) {
+            unBindAndStopService();
             return false;
         }
 
-        if ( !checkBugDesc(true) && !checkAttachmentExist()) {
+        if (!checkBugDesc(true) && !checkAttachmentExist()) {
 //            super.onBackPressed();
             return false;
         } else {
@@ -349,6 +291,7 @@ public class HomeFragment extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
+                            unBindAndStopService();
                             getActivity().finish();
 
                         }
@@ -390,7 +333,6 @@ public class HomeFragment extends BaseFragment {
         }
         return index >= mPicImageList.size() || mPicImageList.isEmpty();
     }
-
 
     private void initPicImageParent() {
         for (int index = 0; index < mPicImageParent.getChildCount(); index++) {
@@ -476,6 +418,245 @@ public class HomeFragment extends BaseFragment {
         return null;
     }
 
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    private boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.home_menu_items, menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+//                Toast.makeText(getContext(), "点击了设置", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getContext(), DynamicToggleActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+//    boolean mLastUpload;
+
+    /**
+     * 显示或隐藏 进度和覆盖一层不可点击的透明Layout
+     *
+     * @param isUpload 是否是上传
+     * @param progress 进度值
+     */
+    private void showOrHideProgressAndCover(boolean isUpload, int progress) {
+
+        if (isUpload) {
+            mBtnSubmit.setIndeterminateProgressMode(false); //不会一直转
+        } else {
+            mBtnSubmit.setIndeterminateProgressMode(true);//压缩的时候一直转
+        }
+
+        mBtnSubmit.setProgress(progress);
+        if ((progress == 100) || (progress == -1) || (progress == 0)) {
+            showOrHideCover(getActivity(), false); //隐藏透明层, 恢复点击
+        } else {
+            showOrHideCover(getActivity(), true); //显示透明层 屏蔽点击
+        }
+
+    }
+
+    /**
+     * 是否显示 覆盖层屏蔽点击
+     *
+     * @param host       activity
+     * @param inProgress 是否正在 提交中 是的话:使屏幕不可点击
+     */
+    private void showOrHideCover(Activity host, boolean inProgress) {
+        if (null == mShelter) {
+            mShelter = new View(getContext());
+            mShelter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
+        }
+        ViewParent viewParent = mShelter.getParent();
+        if (null != viewParent) ((ViewGroup) viewParent).removeView(mShelter);
+        if (inProgress) {
+            ViewGroup parent = (ViewGroup) host.findViewById(android.R.id.content);
+            parent.addView(mShelter);
+        }
+    }
+
+    private Dialog getDialog(String msg) {
+
+        if (builder == null) {
+            builder = new CustomDialog.Builder(getContext());
+            if (dialog == null) {
+                dialog = builder
+                        .setTitle("离线日志")
+                        .setMessage(msg)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .create();
+            } else {
+                builder.setMessage(msg);
+            }
+        } else {
+
+            builder.setMessage(msg);
+        }
+        return dialog;
+    }
+
+
+    private Dialog getSuccessDialog(String msg) {
+        getDialog(msg);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                unBindAndStopService();
+                ((Activity) getContext()).finish();
+            }
+        });
+        return dialog;
+    }
+
+    /**
+     * 显示信息在进度条下方,某些情况会弹框
+     * @param code
+     * @param msg
+     */
+    private void showAndSaveMsg(int code, String msg) {
+        // 显示TextView
+        String time = sdf.format(new Date()) + " ";
+        String saveMsg = time + msg;
+        mMsg = saveMsg + "\n" + mMsg;
+        mTvMsg.setText(mMsg);
+        // 弹Toast
+//                  Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+        //弹对话框
+        if (code == ApiConstants.SUCCESS_CODE) {
+            mEditBugDetails.setText("");
+            mEditContacts.setText("");
+            getSuccessDialog(msg).show();
+//            mYotaLogSwitch.setChecked(true);
+        } else if (code == ApiConstants.TOKEN_CODE) {
+            getDialog(msg).show();
+        }
+        //存文件
+        LogUtil.saveInfoToFile(CYConstants.TYPE_LOG, saveMsg, getContext());
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+    }
+
+    private Fragment getFragment() {
+        return this;
+    }
+
+    class UploadServiceConn implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            myService = ((CompressAppendixService.MyBinder) service).getMyService(); //获取MyService对象
+
+            //第一次开启压缩上传
+            myService.startCompressAndUpload(mServiceIntent, getActivity());
+            mIsBind = true;
+            /**
+             * 使用一个接口来实现回调，这样比上面方法更加灵活，推荐
+             */
+            myService.setUploadListener(new CompressAppendixService.UploadListener() {
+                @Override
+                public void updateBar(long totalSize, long currentSize, float progress, long networkSpeed) {
+
+                    if (!mIsStartUpload) {
+                        mProgressContainer.setVisibility(View.VISIBLE);
+                        mIsStartUpload = true;
+                        scrollToBottom();
+                    } else {
+
+                        if (totalSize == currentSize) { //上传完成
+
+                        }
+
+                    }
+                    String downloadLength = Formatter.formatFileSize(getContext(), currentSize);
+                    String totalLength = Formatter.formatFileSize(getContext(), totalSize);
+                    tvDownloadSize.setText(downloadLength + "/" + totalLength);
+                    String netSpeed = Formatter.formatFileSize(getContext(), networkSpeed);
+                    tvNetSpeed.setText(netSpeed + "/S");
+                    tvProgress.setText((Math.round(progress * 10000) * 1.0f / 100) + "%");
+                    pbProgress.setMax(100);
+                    pbProgress.setProgress((int) (progress * 100));
+                    mBtnSubmit.setProgress((int) (progress * 100));
+                    getDialog("上传到服务器成功");
+
+                }
+
+                @Override
+                public void onFail() {
+                    //上传失败
+                    getDialog("上传失败").show();
+//                    mBtnSubmit.setVisibility(View.VISIBLE);
+                    mProgressContainer.setVisibility(View.GONE);
+//                    mBtnSubmit.setInProgress((Activity) getContext(), false);
+//                    mBtnSubmit.setProgress(-1);
+                    showOrHideProgressAndCover(true, -1);
+                    mIsStartUpload = false;
+                }
+
+                @Override
+                public void sendMsg(int code, String msg) {
+                    if (code == ApiConstants.SUCCESS_CODE) {
+                        mProgressContainer.setVisibility(View.GONE);
+//                        mBtnSubmit.setInProgress((Activity) getContext(), false);
+                        showOrHideProgressAndCover(true, 100);
+                        mIsStartUpload = false;
+//                        mYotaLogSwitch.setChecked(false);
+
+                        //如果 log开关已经打开,那么先关闭,在重新打开,防止文件删除后 log不记录的情况
+                        if ("true".equals(SystemProperties.get(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false"))) {
+                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false");
+                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "true");
+                        }
+
+                    } else if (code == ApiConstants.START_Upload) { //开始上传,显示进度
+                        showOrHideProgressAndCover(true, 1);
+                        return;
+                    } else if (code == ApiConstants.User_Cancel_Upload) {
+                        showOrHideProgressAndCover(false, -1);
+                    }
+                    showAndSaveMsg(code, msg);
+                }
+            });
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mIsBind = false;
+        }
+    }
+
     private class DecodeImageTask extends AsyncTask<Void, Void, Bitmap> {
         private final File mImagePicFile;
         private final int mOpImageIndex;
@@ -544,152 +725,10 @@ public class HomeFragment extends BaseFragment {
             mPicImageList.set(mOpImageIndex, mImagePicFile.getAbsolutePath());
         }
     }
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    private boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-//        inflater.inflate(R.menu.home_menu_items, menu);
-
+    public void onDestroy() {
+        super.onDestroy();
+//        unBindAndStopService();
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-//                Toast.makeText(getContext(), "点击了设置", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getContext(), DynamicToggleActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-//    boolean mLastUpload;
-    /**
-     * 显示或隐藏 进度和覆盖一层不可点击的透明Layout
-     * @param isUpload 是否是上传
-     * @param progress 进度值
-     */
-    private void showOrHideProgressAndCover (boolean isUpload, int progress) {
-
-        if (isUpload) {
-            mBtnSubmit.setIndeterminateProgressMode(false); //不会一直转
-        } else {
-            mBtnSubmit.setIndeterminateProgressMode(true);//压缩的时候一直转
-        }
-
-        mBtnSubmit.setProgress(progress);
-        if ((progress == 100) || (progress == -1)) {
-            showOrHideCover(getActivity(), false); //隐藏透明层, 恢复点击
-        } else {
-            showOrHideCover(getActivity(), true); //显示透明层 屏蔽点击
-        }
-
-    }
-
-    /**
-     * 是否显示 覆盖层屏蔽点击
-     * @param host activity
-     * @param inProgress 是否正在 提交中 是的话:使屏幕不可点击
-     */
-    private void showOrHideCover(Activity host, boolean inProgress) {
-        if (null == mShelter) {
-            mShelter = new View(getContext());
-            mShelter.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                }
-            });
-        }
-        ViewParent viewParent = mShelter.getParent();
-        if (null != viewParent) ((ViewGroup) viewParent).removeView(mShelter);
-        if (inProgress) {
-            ViewGroup parent = (ViewGroup) host.findViewById(android.R.id.content);
-            parent.addView(mShelter);
-        }
-    }
-
-    private Dialog getDialog(String msg) {
-
-        if (builder == null) {
-            builder = new CustomDialog.Builder(getContext());
-            if (dialog == null) {
-                dialog = builder
-                        .setTitle("离线日志")
-                        .setMessage(msg)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .create();
-            } else {
-                builder.setMessage(msg);
-            }
-        } else {
-
-            builder.setMessage(msg);
-        }
-        return dialog;
-    }
-
-
-    private Dialog getSuccessDialog(String msg) {
-        getDialog(msg);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                ((Activity)getContext()).finish();
-            }
-        });
-        return dialog;
-    }
-
-    private void showAndSaveMsg(int code, String msg) {
-        // 显示TextView
-        String time = sdf.format(new Date()) + " ";
-        String saveMsg = time + msg;
-        mMsg = saveMsg + "\n" + mMsg;
-        mTvMsg.setText(mMsg);
-        // 弹Toast
-//                  Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
-        //弹对话框
-        if (code == ApiConstants.SUCCESS_CODE) {
-            mEditBugDetails.setText("");
-            mEditContacts.setText("");
-            getSuccessDialog(msg).show();
-//            mYotaLogSwitch.setChecked(true);
-        } else if (code == ApiConstants.TOKEN_CODE) {
-            getDialog(msg).show();
-        }
-        //存文件
-        LogUtil.saveInfoToFile(CYConstants.TYPE_LOG, saveMsg, getContext());
-        scrollToBottom();
-    }
-
-    Handler mHandler = new Handler();
-    ScrollView mScrollView;
-    private void scrollToBottom(){
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
-    }
-
-    private Fragment getFragment() {
-        return this;
-    }
-
 }

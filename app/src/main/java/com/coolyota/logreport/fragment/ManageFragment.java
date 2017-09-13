@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -75,7 +76,15 @@ public class ManageFragment extends BaseFragment {
     private void initView(View view) {
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        mSwipeRefreshLayout.setEnabled(false);
+//        mSwipeRefreshLayout.setEnabled(false);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mIsRefreshData = true;
+                mFileList = FileUtil.getFileList(new File(mAbsFolderName));
+                mDatas = getDatas(mFileList);
+            }
+        });
         mRlvManage = (RecyclerView) view.findViewById(R.id.rlv_manage);
 
     }
@@ -104,18 +113,30 @@ public class ManageFragment extends BaseFragment {
 
         if (mDatas != null) {
 
-            if (mIsRefreshData) { //刷新数据
+            if (mIsRefreshData || mSwipeRefreshLayout.isRefreshing()) { //刷新数据
+                mDatas.clear();
+                mDatas =  getFileModels(mDatas, fileList);
+                mIsRefreshData = false;
+                mSwipeRefreshLayout.setRefreshing(false);
+                mAdapter.notifyDataSetChanged();
 
             }
 
             return mDatas;
         }
 
+
         List<FileModel> datas = new ArrayList<>();
 
         if (fileList == null) {
             return datas;
         }
+
+        return getFileModels(datas, fileList);
+    }
+
+    @NonNull
+    private List<FileModel> getFileModels(List<FileModel> datas, File[] fileList) {
 
         for (int i = 0; i < fileList.length; i++) {
             File file = fileList[i];
@@ -128,7 +149,6 @@ public class ManageFragment extends BaseFragment {
 
             datas.add(fileModel);
         }
-
 
         return datas;
     }
@@ -227,26 +247,37 @@ public class ManageFragment extends BaseFragment {
                         Toast.makeText(getContext(), "正在清除日志,请稍等...", Toast.LENGTH_SHORT).show();
                         if (isClearAll || isLastFoldChecked) {
                             //先关闭开关,防止写入和删除冲突
+
+                            boolean isYotaLogOn = "true".equals(SystemProperties.get(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false"));
+
                             SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDTYPE, "0");
                             SystemProperties.set(QxdmSettingActivity.PERSIST_SYS_YOTALOG_MDLOG, "false");
-                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false");
+
+                            if (isYotaLogOn) {
+                                SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false");
+                            }
                             if (isClearAll) {
                                 // 清除全部
                                 mDatas.clear();
                                 FileUtil.deleteDirWithFile(new File(mAbsFolderName));//清空sdcard/yota_log
                                 mAdapter.notifyDataSetChanged();
-                                SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "true");
+                                if (isYotaLogOn) {
+                                    SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "true");
+                                }
                                 getBaseActivity().showOrHideCover(false);//恢复点击
                             } else {
-                                clearSelectedLog();
+                                clearSelectedLog(isYotaLogOn);
                             }
                         } else {
-                            clearSelectedLog();
+                            clearSelectedLog(false);
                         }
 
                     }
 
-                    private void clearSelectedLog() {
+                    /**
+                     * @param needOpenYotaLog 是否需要打开常规log开关
+                     */
+                    private void clearSelectedLog(final boolean needOpenYotaLog) {
                         new Thread() {
                             @Override
                             public void run() {
@@ -270,6 +301,10 @@ public class ManageFragment extends BaseFragment {
 //                                            Toast.makeText(getContext(), "日志已清除,如有需要,请重新打开开关记录log", Toast.LENGTH_LONG).show();
 //                                        mYotaLogSwitch.setChecked(true);
 //                                        showOrHideCover((Activity) getContext(), false);
+
+                                        if (needOpenYotaLog) {
+                                            SystemProperties.set(ConfigFragment.PERSIST_SYS_YOTA_LOG, "true");
+                                        }
                                         if (getBaseActivity() == null) {
                                             return;
                                         }

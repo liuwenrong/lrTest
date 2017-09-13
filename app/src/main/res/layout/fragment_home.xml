@@ -260,12 +260,13 @@
                 android:layout_marginRight="100dp"
                 android:layout_marginTop="30dp"
                 android:textColor="@color/cpb_white"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 app:cpb_cornerRadius="48dp"
                 app:cpb_iconComplete="@drawable/ic_action_accept"
-                app:cpb_iconError="@drawable/ic_action_cancel"
+                app:cpb_textError="重新上传"
                 app:cpb_textIdle="@string/submit"/>
 
+            <!--app:cpb_iconError="@drawable/ic_action_cancel"-->
             <!--        <com.coolyota.logreport.ui.RotateInButton
                         android:id="@+id/button_submit"
                         style="@style/SubmitRotateInButtonCommonStyle"

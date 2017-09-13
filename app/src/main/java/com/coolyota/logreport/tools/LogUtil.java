@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.coolyota.logreport.CYLogReporterApplication;
 import com.coolyota.logreport.tools.log.CYLog;
 
 import java.io.BufferedReader;
@@ -108,13 +109,17 @@ public class LogUtil {
     public static String mLogAbsPathByDate;
     private static String[] mFolders = new String[]{/*mAppsFolder, mKernelFolder,*/ mStatusInfoFolder, /*mNetLogFolder,*/ mAnrFolder, mDropboxFolder, mTombstonesFolder, /*mPstoreFolder*/};
 
-    public static void init(Context context) {
-        LOG_PATH_MEMORY_DIR = context.getFilesDir().getAbsolutePath() + File.separator + "log";
+    public void init(Context context) {
+        init();
+    }
+
+    private void init() {
+        LOG_PATH_MEMORY_DIR = CYLogReporterApplication.getInstance().getFilesDir().getAbsolutePath() + File.separator + "log";
         LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
 
         getLogAbsPathByDate();
 
-        setContext(context);
+        setContext(CYLogReporterApplication.getInstance());
         register();
         deploySwitchLogFileTask();
     }
@@ -123,27 +128,31 @@ public class LogUtil {
         init(ctx);
     }
 
-//    private static LogUtil mLogUtil;
-//
-//    public static LogUtil getInstance(Context ctx) {
-//        if (mLogUtil == null) {
-//            synchronized (mLogUtil) {
-//                if (mLogUtil == null) {
-//                    mLogUtil = new LogUtil(ctx);
-//                }
-//            }
-//        }
-//        return mLogUtil;
-//    }
+    private LogUtil() {
+        init();
+    }
 
-    public static void startLog() {
+    private static LogUtil mLogUtil;
+
+    public static LogUtil getInstance() {
+        if (mLogUtil == null) {
+            synchronized (LogUtil.class) {
+                if (mLogUtil == null) {
+                    mLogUtil = new LogUtil();
+                }
+            }
+        }
+        return mLogUtil;
+    }
+
+    public void startLog() {
         new LogCollectorThread().start();
     }
 
     /**
      * 开始收集日志信息
      */
-    public static void createLogCollector() {
+    public void createLogCollector() {
 
         mProcesses = new ArrayList<>();
 
@@ -169,7 +178,9 @@ public class LogUtil {
         }
     }
 
-    public static void collectorStatusInfo() {
+
+
+    public void collectorStatusInfo() {
 
         new Thread() {
 
@@ -280,7 +291,7 @@ public class LogUtil {
      * 检查日志文件大小是否超过了规定大小
      * 如果超过了重新开启一个日志收集进程
      */
-    private static void checkLogSize() {
+    private void checkLogSize() {
         if (CURR_INSTALL_LOG_NAME != null && !"".equals(CURR_INSTALL_LOG_NAME)) {
             String path = LOG_PATH_MEMORY_DIR + File.separator + CURR_INSTALL_LOG_NAME;
             File file = new File(path);
@@ -741,7 +752,7 @@ public class LogUtil {
      *
      * @author Administrator
      */
-    static class LogTaskReceiver extends BroadcastReceiver {
+    class LogTaskReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (SWITCH_LOG_FILE_ACTION.equals(action)) {
@@ -760,7 +771,7 @@ public class LogUtil {
      * 4.处理日志文件
      * 移动 OR 删除
      */
-    static class LogCollectorThread extends Thread {
+    class LogCollectorThread extends Thread {
 
         public LogCollectorThread() {
             super("LogCollectorThread");

@@ -6,11 +6,15 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.coolyota.logreport.R;
 import com.coolyota.logreport.base.BaseFragment;
+import com.coolyota.logreport.constants.CYConstants;
+import com.coolyota.logreport.tools.SystemProperties;
 import com.dd.CircularProgressButton;
+import com.kyleduo.switchbutton.SwitchButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,11 +37,12 @@ public class MonitorFragment extends BaseFragment {
     public CircularProgressButton mCpBtnDumpsys;
     public CircularProgressButton mCpBtnProp;
     public CircularProgressButton mCpBtnMeminfo;
+    public SwitchButton[] mSwitchBtns = new SwitchButton[CYConstants.Monitor_Toggles.length];
     /**
      * log文件夹 sd卡/yota_log
      */
     public String mAbsFolderName;
-    SimpleDateFormat mSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat mSdf = new SimpleDateFormat("yyyy-MM-dd HH_mm_ss");
     long mBtnLastClick = 0; // 上一次提交按钮点击的时间
     public View.OnClickListener onMeminfoClickListener = new View.OnClickListener() {
         @Override
@@ -60,6 +65,28 @@ public class MonitorFragment extends BaseFragment {
             }
         }
     };
+
+        CompoundButton.OnCheckedChangeListener mOnMonitorCheckedChangerListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            for (int i=0; i<mSwitchBtns.length; i++) {
+
+                SwitchButton switchBtn = mSwitchBtns[i];
+
+                if (buttonView == switchBtn) {
+                    SystemProperties.set(CYConstants.PERSIST_SYS_MONITOR_TOGGLE, isChecked ?
+                            "" + (mMonitorToggleValues |= CYConstants.Monitor_Toggles[i]) :   //加上
+                            "" + (mMonitorToggleValues &= ~CYConstants.Monitor_Toggles[i])); //取消
+//                    sendToggleBoardCast(mMonitorToggleValues, i, isChecked);
+                    break; //只要找到一个btn即可退出循环
+                }
+
+            }
+        }
+    };
+
+
     public View.OnClickListener onPropClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -119,6 +146,7 @@ public class MonitorFragment extends BaseFragment {
     };
     public CircularProgressButton mSFBtn;
     public CircularProgressButton mCpuInfoBtn;
+    public int mMonitorToggleValues;
 
     private boolean avoidClickRepeatedly() {
         if (System.currentTimeMillis() - mBtnLastClick < 1000) { // 1 s内不可重复点击
@@ -158,10 +186,35 @@ public class MonitorFragment extends BaseFragment {
         mCpuInfoBtn.setOnClickListener(onDumpsysClickListener);
         mSFBtn.setOnClickListener(onDumpsysClickListener);
 
+        SwitchButton mTombStoneSb = (SwitchButton) view.findViewById(R.id.sb_md_tomb_stone);
+        mSwitchBtns[0] = mTombStoneSb;
+        SwitchButton mAnrSystemSb = (SwitchButton) view.findViewById(R.id.sb_md_anr_system);
+        mSwitchBtns[1] = mAnrSystemSb;
+        SwitchButton mCrashApp = (SwitchButton) view.findViewById(R.id.sb_crash_app);
+        mSwitchBtns[2] = mCrashApp;
+        SwitchButton mFrameworkReboot = (SwitchButton) view.findViewById(R.id.sb_md_reboot);
+        mSwitchBtns[3]  = mFrameworkReboot;
+        SwitchButton mSubSystemReset = (SwitchButton) view.findViewById(R.id.sb_md_reset);
+        mSwitchBtns[4] = mSubSystemReset;
+        SwitchButton mCrashSystem = (SwitchButton) view.findViewById(R.id.sb_crash_system);
+        mSwitchBtns[5] = mCrashSystem;
+        SwitchButton mAnrApp = (SwitchButton) view.findViewById(R.id.sb_anr_app);
+        mSwitchBtns[6] = mAnrApp;
+
     }
 
     private void initData() {
         mAbsFolderName = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
+
+        //设置Monitor属性值
+        for (int i=0; i<mSwitchBtns.length; i++) {
+            mMonitorToggleValues = SystemProperties.getInt(CYConstants.PERSIST_SYS_MONITOR_TOGGLE, 0);
+            if ((mMonitorToggleValues & CYConstants.Monitor_Toggles[i]) != 0) { //=0不包含当前的值,!=0表示打开了当前开关
+                mSwitchBtns[i].setCheckedNoEvent(true);
+            }
+            mSwitchBtns[i].setOnCheckedChangeListener(mOnMonitorCheckedChangerListener);
+        }
+
     }
 
 

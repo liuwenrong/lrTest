@@ -40,7 +40,7 @@ import android.widget.Toast;
 
 import com.coolyota.logreport.base.CloudBaseActivity;
 import com.coolyota.logreport.tools.AccountNameMask;
-import com.coolyota.logreport.tools.CompressAppendixService;
+import com.coolyota.logreport.service.CompressAppendixService;
 import com.coolyota.logreport.tools.ImageDecoder;
 import com.coolyota.logreport.tools.permissiongen.PermissionFail;
 import com.coolyota.logreport.tools.permissiongen.PermissionGen;

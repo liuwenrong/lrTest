@@ -1,6 +1,7 @@
 package com.coolyota.logreport.base;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,4 +52,16 @@ public class BaseActivity extends AppCompatActivity {
         showOrHideCover(this, inProgress);
 
     }
+
+    /**
+     * 回到首页,用在按返回键,有效的处理应用退出后,从任务键进入会传回之前的Intent,导致弹框
+     */
+    public void goHome() {
+        //启动一个意图,回到桌面
+        Intent backHome = new Intent(Intent.ACTION_MAIN);
+        backHome.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        backHome.addCategory(Intent.CATEGORY_HOME);
+        startActivity(backHome);
+    }
+
 }

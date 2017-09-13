@@ -19,5 +19,12 @@
         <item>SYSTEM_UPGRADE</item>
         <item>OTHER_APP</item>
     </string-array>
-
+ <string-array name="log_levels">
+        <item>Verbose</item>
+        <item>Debug</item>
+        <item>Info</item>
+        <item>Warn</item>
+        <item>Error</item>
+        <item>Assert</item>
+    </string-array>
 </resources>

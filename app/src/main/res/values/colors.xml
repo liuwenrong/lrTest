@@ -10,6 +10,9 @@
     <color name="colorSecondary">#757575</color>
     <color name="colorWindowBackground">#757575</color>
     <color name="colorThirdly">#fcfcfc</color>
+    <color name="material_red_400">#EF5350</color>
+
+    <color name="colorTrans">#0000</color>
 
     <color name="textColorPrimary">#212121</color>
     <color name="textColorSecondary">#999</color>

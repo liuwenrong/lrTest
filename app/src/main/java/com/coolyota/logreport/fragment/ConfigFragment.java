@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 
 import com.coolyota.logreport.R;
 import com.coolyota.logreport.base.BaseFragment;
+import com.coolyota.logreport.constants.CYConstants;
 import com.coolyota.logreport.tools.SystemProperties;
 import com.kyleduo.switchbutton.SwitchButton;
 
@@ -39,17 +40,48 @@ public class ConfigFragment extends BaseFragment {
     public SwitchButton mSbAudio;
     public SwitchButton mSbSensor;
     public SwitchButton mSbAndroid;
+    public SwitchButton mSbRadio;
+    public SwitchButton mSbEvents;
+    public SwitchButton mSbKernel;
+
+    public CompoundButton.OnCheckedChangeListener mDumpOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+
+            if (buttonView == mSbRamDumps) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_ENABLE_RAMDUMPS, isChecked ? "1" : "0");
+            } else if (buttonView == mSbRestartLevel) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_RESTART_LEVEL, isChecked ? "ALL_DISABLE" : "ALL_ENABLE");
+            } else if (buttonView == mSbDownloadMode) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_DOWNLOAD_MODE, isChecked ? "1" : "0");
+            }
+
+
+        }
+    };
+
     public CompoundButton.OnCheckedChangeListener mAndroidOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             SystemProperties.set(PERSIST_SYS_YOTA_LOG, isChecked ? "true" : "false");
+
+            if (isChecked) { //联动打开子开关
+                mSbEvents.setCheckedNoEvent(true);
+                mSbKernel.setCheckedNoEvent(true);
+                mSbRadio.setCheckedNoEvent(true);
+            }
+
         }
     };
+    public View mConfigScrollViewContainer;
     public View mConfigGridContainer;
     public View mAndroidContainer;
     public View mQxdmContainer;
     public View mConfigModem;
     public View mConfigDefault;
+    public SwitchButton mSbRamDumps;
+    public SwitchButton mSbRestartLevel;
+    public SwitchButton mSbDownloadMode;
     String[] mTypes = {Type_Modem, Type_GPS, Type_WLAN, Type_AUDIO, Type_SENSOR};
     SwitchButton[] mQxdmBtns = new SwitchButton[5];
     public CompoundButton.OnCheckedChangeListener mQxdmOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
@@ -104,17 +136,13 @@ public class ConfigFragment extends BaseFragment {
     };
     long mBtnLastClick = 0; // 上一次提交按钮点击的时间
     Menu mMenu;
-
-
-/*    public ConfigFragment(String mTabName) {
-        super(mTabName);
-    }*/
     public View.OnClickListener onConfigGridClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
-            mQxdmContainer.setVisibility(View.VISIBLE);
-            mAndroidContainer.setVisibility(View.VISIBLE);
+            mConfigScrollViewContainer.setVisibility(View.VISIBLE);
+//            mQxdmContainer.setVisibility(View.VISIBLE);
+//            mAndroidContainer.setVisibility(View.VISIBLE);
             mConfigGridContainer.setVisibility(View.GONE);
             mMenu.getItem(0).setVisible(false);
             mMenu.getItem(1).setVisible(true);
@@ -191,6 +219,7 @@ public class ConfigFragment extends BaseFragment {
 
         mQxdmContainer = (View) view.findViewById(R.id.qxdm_container);
         mAndroidContainer = (View) view.findViewById(R.id.android_container);
+        mConfigScrollViewContainer = view.findViewById(R.id.tab_config_scrollview_container);
         mConfigGridContainer = (View) view.findViewById(R.id.config_grid_container);
 
         mConfigDefault = (View) view.findViewById(R.id.config_default);
@@ -208,7 +237,14 @@ public class ConfigFragment extends BaseFragment {
         mQxdmBtns[3] = mSbAudio;
         mQxdmBtns[4] = mSbSensor;
 
+        mSbRamDumps = (SwitchButton) view.findViewById(R.id.sb_ramdumps);
+        mSbRestartLevel = (SwitchButton) view.findViewById(R.id.sb_restart_level);
+        mSbDownloadMode = (SwitchButton) view.findViewById(R.id.sb_download_mode);
+
         mSbAndroid = (SwitchButton) view.findViewById(R.id.sb_md_android);
+        mSbRadio = (SwitchButton) view.findViewById(R.id.sb_md_radio);
+        mSbEvents = (SwitchButton) view.findViewById(R.id.sb_md_events);
+        mSbKernel = (SwitchButton) view.findViewById(R.id.sb_md_kernel);
     }
 
     private void initData() {
@@ -216,7 +252,22 @@ public class ConfigFragment extends BaseFragment {
         mConfigDefault.setOnClickListener(onConfigGridClickListener);
         mConfigModem.setOnClickListener(onConfigGridClickListener);
 //        mConfigDefault.setOnC
-        mSbAndroid.setCheckedNoEvent(("true".equals(SystemProperties.get(PERSIST_SYS_YOTA_LOG, "false"))));
+        boolean yotaLogOn = "true".equals(SystemProperties.get(PERSIST_SYS_YOTA_LOG, "false"));
+        mSbAndroid.setCheckedNoEvent(yotaLogOn);
+        if (yotaLogOn) {
+            mSbRadio.setCheckedNoEvent(true);
+            mSbEvents.setCheckedNoEvent(true);
+            mSbKernel.setCheckedNoEvent(true);
+        }
+
+        mSbRamDumps.setCheckedNoEvent(1 == SystemProperties.getInt(CYConstants.PERSIST_SYS_SSR_ENABLE_RAMDUMPS, 0));
+        mSbRestartLevel.setCheckedNoEvent("ALL_DISABLE".equals(SystemProperties.get(CYConstants.PERSIST_SYS_SSR_RESTART_LEVEL, "")));
+        mSbDownloadMode.setCheckedNoEvent(1 == SystemProperties.getInt(CYConstants.PERSIST_SYS_DOWNLOAD_MODE, 0));
+
+        mSbRamDumps.setOnCheckedChangeListener(mDumpOnCheckedChangeListener);
+        mSbRestartLevel.setOnCheckedChangeListener(mDumpOnCheckedChangeListener);
+        mSbDownloadMode.setOnCheckedChangeListener(mDumpOnCheckedChangeListener);
+
         String type = SystemProperties.get(PERSIST_SYS_YOTALOG_MDTYPE, "0");
         for (int i = 0; i < mTypes.length; i++) {
             if ("true".equals(SystemProperties.get(PERSIST_SYS_YOTALOG_MDLOG, "false"))) {
@@ -250,8 +301,9 @@ public class ConfigFragment extends BaseFragment {
         switch (item.getItemId()) {
             case R.id.action_config_list: //goto 列表
 
-                mQxdmContainer.setVisibility(View.VISIBLE);
-                mAndroidContainer.setVisibility(View.VISIBLE);
+//                mQxdmContainer.setVisibility(View.VISIBLE);
+//                mAndroidContainer.setVisibility(View.VISIBLE);
+                mConfigScrollViewContainer.setVisibility(View.VISIBLE);
                 mConfigGridContainer.setVisibility(View.GONE);
                 item.setVisible(false);
                 mMenu.getItem(1).setVisible(true);
@@ -259,8 +311,9 @@ public class ConfigFragment extends BaseFragment {
                 break;
             case R.id.action_config_grid:
 
-                mQxdmContainer.setVisibility(View.GONE);
-                mAndroidContainer.setVisibility(View.GONE);
+//                mQxdmContainer.setVisibility(View.GONE);
+//                mAndroidContainer.setVisibility(View.GONE);
+                mConfigScrollViewContainer.setVisibility(View.GONE);
                 mConfigGridContainer.setVisibility(View.VISIBLE);
                 item.setVisible(false);
                 mMenu.getItem(0).setVisible(true);

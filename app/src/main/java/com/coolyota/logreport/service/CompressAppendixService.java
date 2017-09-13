@@ -1,20 +1,33 @@
-package com.coolyota.logreport.tools;
+package com.coolyota.logreport.service;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.coolyota.logreport.R;
 import com.coolyota.logreport.constants.ApiConstants;
+import com.coolyota.logreport.tools.FileUtil;
+import com.coolyota.logreport.tools.LogUtil;
+import com.coolyota.logreport.tools.NetUtil;
+import com.coolyota.logreport.tools.SystemProperties;
+import com.coolyota.logreport.tools.TelephonyTools;
+import com.coolyota.logreport.tools.UploadFileUtil;
 import com.coolyota.logreport.tools.log.CYLog;
 
 import java.io.BufferedInputStream;
@@ -50,32 +63,47 @@ public class CompressAppendixService extends Service {
 
     public CYLog mCYLog = new CYLog("CompressAppendixService");
     public static final String UP_TYPE = "upType";
+    public static final String KEY_MONITOR_TYPE = "key_monitorType";
     public static final String REBOOT_CHECKED_KEY = "reboot_checked";
     public static final String BUG_DETAILS = "bug_details";
     public static final String USER_CONTACT = "user_contact";
     public static final String PIC_IMAGE_LIST = "pic_image_list";
     private static final byte[] zipDataBuffer = new byte[1024 * 1024];
     private static final String START_ID = "start_id";
+    private int mMonitorType = -1;
 
     HashMap<String, File> mDeleteFileOrFolder = new HashMap<>();
 
     private Context mContext;
+    private Activity mActivity;
     /**
      * log文件夹 sd卡/yota_log
      */
     public String mAbsFolderName;
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {//170906以后不使用startService启动服务
         final Bundle extras = new Bundle(intent.getExtras());
         extras.putInt(START_ID, startId);
         mContext = this;
 
-//        mCYLog.debug("74---------startCommand");
         genZip(extras);
 
         return Service.START_NOT_STICKY;
 //        return Service.START_REDELIVER_INTENT; //重启服务导致多次上传
+    }
+
+    /**
+     * 采用bindService方式,不用StartService
+     * @param intent
+     */
+    public void startCompressAndUpload(Intent intent, Activity activity) {
+
+        final Bundle extras = new Bundle(intent.getExtras());
+        mContext = this;
+        mActivity = activity;
+        genZip(extras);
+
     }
 
     /**
@@ -99,6 +127,8 @@ public class CompressAppendixService extends Service {
                     return null;
                 }
 
+                mMonitorType = extras.getInt(KEY_MONITOR_TYPE);
+
                 File zipAllFile = new File(Environment.getExternalStorageDirectory(), FOLDER_NAME + File.separator + "UploadFile" + File
                         .separator + SystemProperties.get("ro.build.id", "") + "_" + getReportFileTimestamp() /* + "_" + imei */+ ".zip");
 
@@ -116,14 +146,13 @@ public class CompressAppendixService extends Service {
                     if (null != picImageList) {
                         for (String picImagePath : picImageList) {
                             if (null != picImagePath) {
-                                ensureTransferValidFileToGZip(zipOs, new File(picImagePath), null, null);
+                                FileUtil.ensureTransferValidFileToGZip(zipOs, new File(picImagePath), null, null);
                                 isZipEmpty = false;
                             }
                         }
                     }
 
-                    LogUtil.init(getContext());
-                    LogUtil.collectorStatusInfo();
+                    LogUtil.getInstance().collectorStatusInfo();
 
                     //滚动日志与离线日志 系统的无法上传后删除, TODO 暂时注释
                    /* File dropbox = new File("/data/system/dropbox");
@@ -137,16 +166,16 @@ public class CompressAppendixService extends Service {
                     // anr日志
                     File anr = new File("/data/anr"); //traces.txt 文件
                     if (anr.exists() && anr.isDirectory()) {
-                        ensureAllReadWrite(anr);
-                        boolean result = ensureTransferValidFileToGZip(zipOs, anr, "statusinfo", null);
+                        FileUtil.ensureAllReadWrite(anr);
+                        boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, anr, "statusinfo", null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
                     mDeleteFileOrFolder.put("anr", anr);
 
                     final File tombstones = new File("/data/tombstones");
                     if (tombstones.exists() && tombstones.isDirectory()) {
-                        ensureAllReadWrite(tombstones);
-                        boolean result = ensureTransferValidFileToGZip(zipOs, tombstones, "statusinfo", null);
+                        FileUtil.ensureAllReadWrite(tombstones);
+                        boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, tombstones, "statusinfo", null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
                     // 没有删除权限
@@ -164,107 +193,15 @@ public class CompressAppendixService extends Service {
 
                     final File statusinfo = new File(mAbsFolderName + File.separator + "statusinfo");
                     if (statusinfo.exists() && statusinfo.isDirectory()) {
-                        ensureAllReadWrite(statusinfo);
-                        boolean result = ensureTransferValidFileToGZip(zipOs, statusinfo, null, null);
+//                        ensureAllReadWrite(statusinfo);
+                        boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, statusinfo, null, null);
                         isZipEmpty = result ? false : isZipEmpty;
                     }
                     mDeleteFileOrFolder.put("statusinfo", statusinfo);
 
-                    // 获取底层最新的yot_log目录,如果第一个文件夹小于10M,压缩返回最新的和第二新的文件夹
-                    boolean isRebootChecked = extras.getBoolean(REBOOT_CHECKED_KEY);
-                    List<String> folderByDates = getYotaLogFoldersByTime();
-                    // 日期的文件夹大于两个, 且第一个文件夹小于10M 或者 或者勾选了 异常关机重启
-                    if(folderByDates.size() >= 2 && ( (getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize10M) || isRebootChecked) ){
-
-                        String folderByDate0 = folderByDates.get(0);
-                        final File yotalogDate0 = new File(mAbsFolderName + File.separator + folderByDate0);
-                        if (yotalogDate0.exists() && yotalogDate0.isDirectory()) {
-                            ensureAllReadWrite(yotalogDate0);
-                            boolean result = ensureTransferValidFileToGZip(zipOs, yotalogDate0, null, folderByDate0);
-                            isZipEmpty = result ? false : isZipEmpty;
-                        }
-                        mDeleteFileOrFolder.put("yota_log", yotalogDate0);
-
-                        // history 上一个记录的文件夹存放在history目录下
-                        String folderByDate1 = folderByDates.get(1);
-                        String appEntryParentName = "history" + File.separator + "apps"; //部分apps的log 取最新的几个文件
-                        String appFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "apps";
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", appEntryParentName);
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", appEntryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", appEntryParentName);
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", appEntryParentName);
-                        if (new File(appFolderName + File.separator + "android.txt").length() < 5 * 1024 * 1024){ //第一个文件小于10M
-
-                            transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", appEntryParentName);
-                        }
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", appEntryParentName);
+                    isZipEmpty = genYotaLog(zipOs, isZipEmpty, extras);
 
 
-                        String kernelFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "kernel"; //全部kernel
-                        File kernelDate0File = new File(kernelFolderName);
-                        if (kernelDate0File.exists() && kernelDate0File.isDirectory()) {
-                            ensureAllReadWrite(kernelDate0File);
-                            boolean result = ensureTransferValidFileToGZip(zipOs, kernelDate0File, "history", null);
-                            isZipEmpty = result ? false : isZipEmpty;
-                        }
-
-                        // TODO 文件过大,暂时不用
-                        /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "netlog";
-                        File netlogDate0File = new File(netlogFolderName);
-                        if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
-                            ensureAllReadWrite(netlogDate0File);
-                            boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, "history", null);
-                            isZipEmpty = result ? false : isZipEmpty;
-                        }*/
-
-                        mDeleteFileOrFolder.put("history", new File( mAbsFolderName + File.separator + folderByDate1));
-
-
-                    } else if (folderByDates.size() > 0){
-                        //去各目录取文件,有些文件取3个
-                        String folderByDate0 = folderByDates.get(0);
-                        String entryParentName = "apps";
-
-                        String appFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "apps";
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", entryParentName);
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt.1", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", entryParentName);
-                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", entryParentName);
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt.01", entryParentName);
-                        if (new File(appFolderName + File.separator + "android.txt").length() < 10 * 1024 * 1024){ //第一个文件小于10M
-
-                            transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", entryParentName);
-                        }
-//                        transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.02", entryParentName);
-
-                        String kernelFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "kernel";
-                        File kernelDate0File = new File(kernelFolderName);
-                        if (kernelDate0File.exists() && kernelDate0File.isDirectory()) {
-                            ensureAllReadWrite(kernelDate0File);
-                            boolean result = ensureTransferValidFileToGZip(zipOs, kernelDate0File, null, null);
-                            isZipEmpty = result ? false : isZipEmpty;
-                        }
-
-                        /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "netlog";
-                        File netlogDate0File = new File(netlogFolderName);// TODO 文件过大,暂时不用
-                        if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
-                            ensureAllReadWrite(netlogDate0File);
-                            boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, null, null);
-                            isZipEmpty = result ? false : isZipEmpty;
-                        }*/
-
-                        mDeleteFileOrFolder.put("yota_log", new File(mAbsFolderName + File.separator + folderByDate0));
-
-                    }
-
-//                    cleanAllLogFiles();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -315,7 +252,7 @@ public class CompressAppendixService extends Service {
             /**
              * 删除已经上传的log
              */
-            private void deleteUploadLogs() {
+            private void deleteUploadLogs(HashMap<String, File> mDeleteFileOrFolder) {
                 mCYLog.debug("删除已上传的文件");
                 Set<String> keys = mDeleteFileOrFolder.keySet();
                 for (String key: keys){
@@ -325,30 +262,11 @@ public class CompressAppendixService extends Service {
                         if (file.isFile()){
                             file.delete();
                         }else if(file.isDirectory()) {
-                            deleteLogFileDir(file, true);
-                            /*if ("history".equals(key)) {
-                                deleteLogFileDir(file, true);
-                            }else {
-                                deleteLogFileDir(file, false);
-                            }*/
+                            FileUtil.deleteLogFileDir(file, true);
                         }
                     }
 
                 }
-            }
-
-
-            private void cleanAllLogFiles() {
-                deleteLogFileDir(new File("/data/system/dropbox"), false);
-                deleteLogFileDir(new File("/data/anr"), false);
-                deleteLogFileDir(new File("/data/tombstones"), false);
-                deleteLogFileDir(new File("/data/zslogs/logcat"), false);
-                deleteLogFileDir(new File("/data/zslogs/battery"), false);
-                deleteLogFileDir(new File("/data/zslogs/modem"), false);
-
-                deleteLogFileDir(new File("/data/zslogs/wlan"), false);
-                deleteLogFileDir(new File("/data/zslogs/gps"), false);
-                deleteLogFileDir(new File("/data/zslogs/tcpdump"), false);
             }
 
             private void keepLastFiles(File zslogDir, int keepNum) {
@@ -382,7 +300,7 @@ public class CompressAppendixService extends Service {
                 boolean hasLogFile = false;
                 if (null != logFile && logFile.exists()) {
                     if (logFile.isFile() && 0 < logFile.length()) {
-                        transferFileToGZip(zipOs, logFile.getAbsolutePath(), entryParentName);
+                        FileUtil.transferFileToGZip(zipOs, logFile.getAbsolutePath(), entryParentName);
                         hasLogFile = true;
                     } else if (logFile.isDirectory()) {
                         File[] logFiles = logFile.listFiles();
@@ -434,7 +352,7 @@ public class CompressAppendixService extends Service {
             }
 
             @Override
-            protected void onPostExecute(final File zipAllFile) {
+            protected void onPostExecute(final File zipAllFile) { //主要执行上传到服务器,当前处于UI线程
                 if (null != zipAllFile && zipAllFile.exists()) {
                     if (0 == zipAllFile.length()) {
                         zipAllFile.delete();
@@ -459,60 +377,22 @@ public class CompressAppendixService extends Service {
                             }
                             return;
                         } else {
+
+                            //判断移动网,并弹框提示用户
+                            if (NetUtil.isNetworkTypeWifi(getContext())) {
+//                            if (NetUtil.isMobile(getContext())) {
+                                showMobileNetUploadDialog(zipAllFile, extras);
+                                return;
+
+                            }
+
+
                             if (mUploadListener != null) {
                                 mUploadListener.sendMsg(ApiConstants.OTHER_CODE, "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器");
                             }
                         }
 
-                        final HashMap<String, Object> params = new HashMap<>();
-                        params.put(ApiConstants.PARAM_LOG_TYPE, ApiConstants.LOG_TYPE_LOG);
-                        params.put(ApiConstants.PARAM_PRO_TYPE, TelephonyTools.getProType());
-                        params.put(ApiConstants.PARAM_SYS_VERSION, TelephonyTools.getSysVersion());
-                        params.put(ApiConstants.PARAM_UP_TYPE, extras.getInt(UP_TYPE));
-                        params.put(ApiConstants.PARAM_UP_DESC, extras.getString(BUG_DETAILS));
-                        params.put(ApiConstants.PARAM_PHONE, extras.getString(USER_CONTACT));
-
-                        params.put(ApiConstants.PARAM_FILE, zipAllFile);
-
-//                        UploadFileUtil.uploadFile(ApiConstants.PATH_UPLOAD, params, zipAllFile);
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                UploadFileUtil.upLoadFile(ApiConstants.PATH_UPLOAD, params, new UploadFileUtil.ReqProgressCallBack<String>(){
-
-                                    @Override
-                                    public void onSuccessInUiThread() {
-
-                                        deleteUploadLogs();
-                                    }
-
-                                    @Override
-                                    public void onFail() {
-                                        zipAllFile.delete();
-                                        if (mUploadListener != null) {
-                                            mUploadListener.onFail();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void sendMsg(int code, String msg) {
-                                        if (mUploadListener != null) {
-                                            mUploadListener.sendMsg(code, msg);
-                                        }
-                                    }
-
-
-                                    @Override
-                                    public void onProgressInUIThread(long total, long current, float progress, long networkSpeed) {
-                                        if (mUploadListener != null) {
-                                            mUploadListener.updateBar(total, current, progress, networkSpeed);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        ).start();
+                        startUploadFile(zipAllFile, extras);
 
                     }
                 } else {
@@ -521,6 +401,206 @@ public class CompressAppendixService extends Service {
             }
         }.execute();
 
+    }
+
+    /**
+     * 当处于数据网络时,弹框提示用户
+     * @param zipAllFile
+     * @param extras
+     */
+    private void showMobileNetUploadDialog(final File zipAllFile, final Bundle extras) {
+        new MaterialDialog.Builder(getActivity())
+                .title("上传Log日志")
+                .content("当前使用的是数据网络,将消耗"+ FileUtil.getDataSize(zipAllFile.length()) + "流量,是否继续?")
+                .positiveText("确定")
+                .negativeText("取消")
+                .positiveColorRes(R.color.material_red_400)
+                .negativeColorRes(R.color.material_red_400)
+                .titleGravity(GravityEnum.CENTER)
+                .titleColorRes(R.color.material_red_400)
+                .contentColorRes(android.R.color.white)
+                .backgroundColorRes(R.color.material_blue_grey_800)
+                .dividerColorRes(R.color.colorAccent)
+                .btnSelector(R.drawable.md_btn_selector_custom, DialogAction.POSITIVE)
+                .positiveColor(Color.WHITE)
+                .negativeColorAttr(android.R.attr.textColorSecondaryInverse)
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (mUploadListener != null) {
+                            mUploadListener.sendMsg(ApiConstants.User_Cancel_Upload, "当前处于数据网络,用户取消上传");
+                        }
+
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (mUploadListener != null) {
+                            mUploadListener.sendMsg(ApiConstants.OTHER_CODE, "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器");
+                            startUploadFile(zipAllFile, extras);
+                        }
+                    }
+                })
+                .canceledOnTouchOutside(false)
+                .cancelable(false)
+                .theme(Theme.DARK)
+                .show();
+    }
+
+    private void startUploadFile(final File zipAllFile, Bundle extras) {
+        final HashMap<String, Object> params = new HashMap<>();
+        params.put(ApiConstants.PARAM_LOG_TYPE, ApiConstants.LOG_TYPE_LOG);
+        params.put(ApiConstants.PARAM_PRO_TYPE, TelephonyTools.getProType());
+        params.put(ApiConstants.PARAM_SYS_VERSION, TelephonyTools.getSysVersion());
+        params.put(ApiConstants.PARAM_UP_TYPE, extras.getInt(UP_TYPE));
+        params.put(ApiConstants.PARAM_UP_DESC, extras.getString(BUG_DETAILS));
+        params.put(ApiConstants.PARAM_PHONE, extras.getString(USER_CONTACT));
+
+        params.put(ApiConstants.PARAM_FILE, zipAllFile);
+
+//                        UploadFileUtil.uploadFile(ApiConstants.PATH_UPLOAD, params, zipAllFile);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UploadFileUtil.upLoadFile(ApiConstants.PATH_UPLOAD, params, new UploadFileUtil.ReqProgressCallBack<String>(){
+
+                    @Override
+                    public void onSuccessInUiThread() {
+
+                        FileUtil.deleteUploadLogs(mDeleteFileOrFolder);
+                    }
+
+                    @Override
+                    public void onFail() {
+                        zipAllFile.delete();
+                        if (mUploadListener != null) {
+                            mUploadListener.onFail();
+                        }
+                    }
+
+                    @Override
+                    public void sendMsg(int code, String msg) {
+                        if (mUploadListener != null) {
+                            mUploadListener.sendMsg(code, msg);
+                        }
+                    }
+
+
+                    @Override
+                    public void onProgressInUIThread(long total, long current, float progress, long networkSpeed) {
+                        if (mUploadListener != null) {
+                            mUploadListener.updateBar(total, current, progress, networkSpeed);
+                        }
+                    }
+                });
+            }
+        }
+        ).start();
+        if (mUploadListener != null) {
+            //
+            mUploadListener.sendMsg(ApiConstants.START_Upload, "开始上传");
+        }
+    }
+
+    /**
+     * 压缩yota_log中的log
+     * @param zipOs
+     * @param isZipEmpty
+     * @param extras
+     * @return
+     * @throws IOException
+     */
+    private boolean genYotaLog(ZipOutputStream zipOs, boolean isZipEmpty, Bundle extras) throws IOException {
+        // 获取底层最新的yot_log目录,如果第一个文件夹小于10M,压缩返回最新的和第二新的文件夹
+        boolean isRebootChecked = extras.getBoolean(REBOOT_CHECKED_KEY);
+        List<String> folderByDates = getYotaLogFoldersByTime();
+        // 日期的文件夹大于两个, 且第一个文件夹小于10M 或者 或者勾选了 异常关机重启
+        if(folderByDates.size() >= 2 && ( (getFolderSize(new File(mAbsFolderName + File.separator + folderByDates.get(0))) < mSize10M) || isRebootChecked) ){
+
+            String folderByDate0 = folderByDates.get(0);
+            final File yotalogDate0 = new File(mAbsFolderName + File.separator + folderByDate0);
+            if (yotalogDate0.exists() && yotalogDate0.isDirectory()) {
+//                            ensureAllReadWrite(yotalogDate0);
+                boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, yotalogDate0, null, folderByDate0);
+                isZipEmpty = result ? false : isZipEmpty;
+            }
+            mDeleteFileOrFolder.put("yota_log", yotalogDate0);
+
+            // history 上一个记录的文件夹存放在history目录下
+            String folderByDate1 = folderByDates.get(1);
+            String appEntryParentName = "history" + File.separator + "apps"; //部分apps的log 取最新的几个文件
+            String appFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "apps";
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt", appEntryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", appEntryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", appEntryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", appEntryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", appEntryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", appEntryParentName);
+            if (new File(appFolderName + File.separator + "android.txt").length() < 5 * 1024 * 1024){ //第一个文件小于10M
+
+                FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", appEntryParentName);
+            }
+
+            String kernelFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "kernel"; //全部kernel
+            File kernelDate0File = new File(kernelFolderName);
+            if (kernelDate0File.exists() && kernelDate0File.isDirectory()) {
+//                            ensureAllReadWrite(kernelDate0File);
+                boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, kernelDate0File, "history", null);
+                isZipEmpty = result ? false : isZipEmpty;
+            }
+
+            // TODO 文件过大,暂时不用
+            /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate1 + File.separator + "netlog";
+            File netlogDate0File = new File(netlogFolderName);
+            if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
+                ensureAllReadWrite(netlogDate0File);
+                boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, "history", null);
+                isZipEmpty = result ? false : isZipEmpty;
+            }*/
+
+            mDeleteFileOrFolder.put("history", new File( mAbsFolderName + File.separator + folderByDate1));
+
+
+        } else if (folderByDates.size() > 0){
+            //去各目录取文件,有些文件取3个
+            String folderByDate0 = folderByDates.get(0);
+            String entryParentName = "apps";
+
+            String appFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "apps";
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt", entryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android_boot.txt", entryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "events.txt", entryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "events_boot.txt", entryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "radio.txt", entryParentName);
+            FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "radio_boot.txt", entryParentName);
+            if (new File(appFolderName + File.separator + "android.txt").length() < 10 * 1024 * 1024){ //第一个文件小于10M
+
+                FileUtil.transferFileToGZip(zipOs, appFolderName + File.separator + "android.txt.01", entryParentName);
+            }
+
+            String kernelFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "kernel";
+            File kernelDate0File = new File(kernelFolderName);
+            if (kernelDate0File.exists() && kernelDate0File.isDirectory()) {
+//                            ensureAllReadWrite(kernelDate0File);
+                boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, kernelDate0File, null, null);
+                isZipEmpty = result ? false : isZipEmpty;
+            }
+
+            /*String netlogFolderName = mAbsFolderName + File.separator + folderByDate0 + File.separator + "netlog";
+            File netlogDate0File = new File(netlogFolderName);// TODO 文件过大,暂时不用
+            if (netlogDate0File.exists() && netlogDate0File.isDirectory()) {
+                ensureAllReadWrite(netlogDate0File);
+                boolean result = ensureTransferValidFileToGZip(zipOs, netlogDate0File, null, null);
+                isZipEmpty = result ? false : isZipEmpty;
+            }*/
+
+            mDeleteFileOrFolder.put("yota_log", new File(mAbsFolderName + File.separator + folderByDate0));
+
+        }
+        return isZipEmpty;
     }
 
     /**
@@ -641,6 +721,9 @@ public class CompressAppendixService extends Service {
 
     public Context getContext(){
         return mContext;
+    }
+    public Activity getActivity() {
+        return mActivity;
     }
 
 

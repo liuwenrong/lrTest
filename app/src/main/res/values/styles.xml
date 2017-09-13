@@ -30,6 +30,14 @@
 
     </style>
 
+    <style name="ActivityTrans" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/colorTrans</item>
+        <item name="colorPrimaryDark">@color/colorTrans</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
     <!-- 设置Toolbar标题字体的大小 -->
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">15sp</item>
