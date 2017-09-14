@@ -101,6 +101,8 @@ public class HomeFragment extends BaseFragment {
     long mBtnLastClick = 0; // 上一次提交按钮点击的时间
     Handler mHandler = new Handler();
     ScrollView mScrollView;
+    int mMonitorType = -1;
+    boolean mIsBind;
     private EditText mEditBugDetails;
     private ViewGroup mPicImageParent;
     private ViewGroup mDeletePicParent;
@@ -205,11 +207,8 @@ public class HomeFragment extends BaseFragment {
                 PermissionGen.needPermission(getFragment(), REQUEST_CODE_PERMISSION_ACCESS_PHONE, Manifest.permission.READ_PHONE_STATE);
             }
             fireServiceForSubmit();
-//                    Toast.makeText(LogSettingActivity.this, R.string.report_save_ok, Toast.LENGTH_LONG).show();
-//                    finish();
         } else if (!getActivity().isDestroyed()) {
             Toast.makeText(getContext(), "当前网络不可用,请连上网络后再试.", Toast.LENGTH_SHORT).show();
-//            mBtnSubmit.setInProgress((Activity) getContext(), false);
             showOrHideProgressAndCover(false, -1);
         }
     }
@@ -251,17 +250,15 @@ public class HomeFragment extends BaseFragment {
 
     }
 
-    int mMonitorType = -1;
-
     public void setMonitorType(int monitorType) {
         mMonitorType = monitorType;
     }
+
     @Override
     public int getTabNameResId() {
         return mTabNameResId;
     }
 
-    boolean mIsBind;
     private void unBindAndStopService() {
 //        if (mServiceIntent != null)
 //        getContext().stopService(mServiceIntent);
@@ -535,6 +532,7 @@ public class HomeFragment extends BaseFragment {
 
     /**
      * 显示信息在进度条下方,某些情况会弹框
+     *
      * @param code
      * @param msg
      */
@@ -544,14 +542,9 @@ public class HomeFragment extends BaseFragment {
         String saveMsg = time + msg;
         mMsg = saveMsg + "\n" + mMsg;
         mTvMsg.setText(mMsg);
-        // 弹Toast
-//                  Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
         //弹对话框
         if (code == ApiConstants.SUCCESS_CODE) {
-            mEditBugDetails.setText("");
-            mEditContacts.setText("");
             getSuccessDialog(msg).show();
-//            mYotaLogSwitch.setChecked(true);
         } else if (code == ApiConstants.TOKEN_CODE) {
             getDialog(msg).show();
         }
@@ -571,6 +564,12 @@ public class HomeFragment extends BaseFragment {
 
     private Fragment getFragment() {
         return this;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        unBindAndStopService();
     }
 
     class UploadServiceConn implements ServiceConnection {
@@ -629,10 +628,22 @@ public class HomeFragment extends BaseFragment {
                 public void sendMsg(int code, String msg) {
                     if (code == ApiConstants.SUCCESS_CODE) {
                         mProgressContainer.setVisibility(View.GONE);
-//                        mBtnSubmit.setInProgress((Activity) getContext(), false);
                         showOrHideProgressAndCover(true, 100);
                         mIsStartUpload = false;
-//                        mYotaLogSwitch.setChecked(false);
+
+                        //清空文本 和 图片
+                        mEditBugDetails.setText("");
+                        mEditContacts.setText("");
+
+                        mPicImageList.clear();
+                        for (int index = 0; index < mPicImageParent.getChildCount(); index++) {
+                            ((ImageView) mPicImageParent.getChildAt(index)).setImageResource(R.drawable.ic_add_image_selector);
+                            mPicImageList.add(null);
+                        }
+                        for (int index = 0; index < mDeletePicParent.getChildCount(); index++) {
+                            mDeletePicParent.getChildAt(index).setVisibility(View.GONE);
+                        }
+
 
                         //如果 log开关已经打开,那么先关闭,在重新打开,防止文件删除后 log不记录的情况
                         if ("true".equals(SystemProperties.get(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false"))) {
@@ -724,11 +735,5 @@ public class HomeFragment extends BaseFragment {
 
             mPicImageList.set(mOpImageIndex, mImagePicFile.getAbsolutePath());
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-//        unBindAndStopService();
     }
 }

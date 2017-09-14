@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.Theme;
 import com.coolyota.logreport.adapter.MainFragmentPagerAdapter;
 import com.coolyota.logreport.base.BaseActivity;
 import com.coolyota.logreport.base.BaseFragment;
+import com.coolyota.logreport.constants.CYConstants;
 import com.coolyota.logreport.fragment.ConfigFragment;
 import com.coolyota.logreport.fragment.HomeFragment;
 import com.coolyota.logreport.fragment.ManageFragment;
@@ -34,7 +35,7 @@ import static com.coolyota.logreport.fragment.ConfigFragment.PERSIST_SYS_YOTA_LO
 
 public class MainActivity extends BaseActivity {
 
-    private static final String EXCEPTION_TYPE_KEY = "exception.type";
+    public static final String EXCEPTION_TYPE_KEY = "exception.type";
     private static final String EXCEPTION_DATA_KEY = "exception.data";
     public TabLayout mTabLayout;
     public ViewPager mViewPager;
@@ -71,8 +72,22 @@ public class MainActivity extends BaseActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
             }
+
+            if (mMonitorType == CYConstants.MonitorToggle.FRAMEWORK_REBOOT || mMonitorType == CYConstants.MonitorToggle.TOMBSTONE) {
+                // 系统重启 或 tombstone类型,置为-1 防止下次开机再次弹窗
+                SystemProperties.set("persist.sys.yota.reboot", "-1");
+            }
+
 //            showThemed(mMonitorType, mMonitorData);
         } else {
+
+            //不是Monitor监听启动时,显示在最近任务列表
+
+            if ( (flags & Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS) != 0) { //包含这个Flag,即没有显示在最近任务
+                flags &= ~Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS;
+                intent.setFlags(flags);
+
+            }
 
         }
 
@@ -197,8 +212,8 @@ public class MainActivity extends BaseActivity {
         if (mHomeFragment != null && mHomeFragment.onBackPressed()) {
             //自己处理事件
         } else {
-            goHome();
-//            super.onBackPressed();
+//            goHome();
+            super.onBackPressed();
         }
     }
 

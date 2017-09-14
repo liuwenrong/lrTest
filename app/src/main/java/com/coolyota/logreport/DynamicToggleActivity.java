@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -29,18 +30,21 @@ public class DynamicToggleActivity extends BaseActivity {
     public static final String KEY_DYNAMIC_TOGGLE = "dynamicToggle";
     public static final String KEY_TYPE = "key_type";//值0时则为INPUT,1表示Power
     public static final String KEY_IS_OPEN = "key_is_open"; //true 表示打开,false表示关闭
-        private static final String KEY_LOG_LEVEL = "key_log_level";
-        private static final int LOG_LEVEL = 111; //configure dynamic log level
+    private static final String KEY_LOG_LEVEL = "key_log_level";
+    private static final int LOG_LEVEL = 111; //configure dynamic log level
 
     public SwitchButton mSbPower;
     public SwitchButton mSbInput;
     public SwitchButton[] mSwitchButtons = new SwitchButton[CYConstants.Dynamic_Toggles.length];
-
+    public int mDynamicToggle;
+    public TextView mLogLevelTv;
+    public int mLogLevel;
+    public String[] mStrLogLevels;
     CompoundButton.OnCheckedChangeListener mOnCheckedChangerListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-            for (int i=0; i<mSwitchButtons.length; i++) {
+            for (int i = 0; i < mSwitchButtons.length; i++) {
 
                 SwitchButton switchBtn = mSwitchButtons[i];
 
@@ -55,15 +59,16 @@ public class DynamicToggleActivity extends BaseActivity {
             }
         }
     };
-    public int mDynamicToggle;
-    public TextView mLogLevelTv;
-    public int mLogLevel;
-    public String[] mStrLogLevels;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_dynamic_toggle);
+
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setTitle("动态开关");
 
         initView();
 

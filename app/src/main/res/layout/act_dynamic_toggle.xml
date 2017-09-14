@@ -154,7 +154,7 @@
         <RelativeLayout
             android:id="@+id/android_container"
             style="@style/ConfigLv1ContainerStyle"
-            android:visibility="visible"
+            android:visibility="gone"
             >
 
         <TextView

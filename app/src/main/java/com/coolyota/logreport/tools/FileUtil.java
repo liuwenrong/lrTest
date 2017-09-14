@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -89,7 +91,20 @@ public class FileUtil {
             return null;
         }
 
-        return file.listFiles();
+        File[] files = file.listFiles();
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file, File newFile) { //最后修改时间倒序排列
+                if (file.lastModified() < newFile.lastModified()) {
+                    return 1;
+                } else if (file.lastModified() == newFile.lastModified()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return files;
     }
 
 

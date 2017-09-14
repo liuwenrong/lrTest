@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
@@ -22,6 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.coolyota.logreport.R;
 import com.coolyota.logreport.constants.ApiConstants;
+import com.coolyota.logreport.fragment.ConfigFragment;
 import com.coolyota.logreport.tools.FileUtil;
 import com.coolyota.logreport.tools.LogUtil;
 import com.coolyota.logreport.tools.NetUtil;
@@ -30,24 +30,16 @@ import com.coolyota.logreport.tools.TelephonyTools;
 import com.coolyota.logreport.tools.UploadFileUtil;
 import com.coolyota.logreport.tools.log.CYLog;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static com.coolyota.logreport.tools.LogUtil.FOLDER_NAME;
@@ -199,8 +191,29 @@ public class CompressAppendixService extends Service {
                     }
                     mDeleteFileOrFolder.put("statusinfo", statusinfo);
 
-                    isZipEmpty = genYotaLog(zipOs, isZipEmpty, extras);
+                    if ("false".equals(SystemProperties.get(ConfigFragment.PERSIST_SYS_YOTA_LOG, "false"))) {
+                        // 没打开自己收集log
+                        LogUtil.getInstance().collectLogcat();
 
+                        try {
+                            // 当前在子线程,等待3s收集logcat日志,然后在压缩
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        final File logFile = new File(mAbsFolderName + File.separator + "apps");
+                        if (logFile.exists() && logFile.isDirectory()) {
+//                        ensureAllReadWrite(logFile);
+                            boolean result = FileUtil.ensureTransferValidFileToGZip(zipOs, logFile, null, null);
+                            isZipEmpty = result ? false : isZipEmpty;
+                        }
+                        mDeleteFileOrFolder.put("apps", logFile);
+
+                    } else {
+                        // 如果打开了,则去拿底层收集的Log
+                        isZipEmpty = genYotaLog(zipOs, isZipEmpty, extras);
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -221,134 +234,6 @@ public class CompressAppendixService extends Service {
                 }
                 mDeleteFileOrFolder.put("zipAllFile", zipAllFile);
                 return zipAllFile;
-            }
-
-            private void ensureAllReadWrite(File logDir) {
-                try {
-                    Process process = Runtime.getRuntime().exec("chmod a+rw -R " + logDir.getAbsolutePath());
-                    Thread.currentThread().sleep(500);
-                    process.destroy();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            private void deleteLogFileDir(File dir, boolean deleteDir) {
-                if (!dir.exists()) return;
-                File[] list = dir.listFiles();
-                if (null == list) return;
-                for (File file : list) {
-                    if (file.isFile()) {
-                        file.delete();
-                    } else if (file.isDirectory()) {
-                        deleteLogFileDir(file, true);
-                    }
-                }
-                if (deleteDir) dir.delete();
-            }
-
-            /**
-             * 删除已经上传的log
-             */
-            private void deleteUploadLogs(HashMap<String, File> mDeleteFileOrFolder) {
-                mCYLog.debug("删除已上传的文件");
-                Set<String> keys = mDeleteFileOrFolder.keySet();
-                for (String key: keys){
-
-                    File file = mDeleteFileOrFolder.get(key);
-                    if (file.exists()){
-                        if (file.isFile()){
-                            file.delete();
-                        }else if(file.isDirectory()) {
-                            FileUtil.deleteLogFileDir(file, true);
-                        }
-                    }
-
-                }
-            }
-
-            private void keepLastFiles(File zslogDir, int keepNum) {
-                if (null != zslogDir && zslogDir.exists() && zslogDir.isDirectory()) {
-                    final File[] subDir = zslogDir.listFiles();
-                    if (null != subDir && subDir.length == 1 && subDir[0].isDirectory() && subDir[0].getName().equals(zslogDir.getName())) {
-                        keepLastFiles(subDir[0], keepNum);
-                    } else if (null != subDir && subDir.length > 0) {
-                        List<File> subLogFiles = Arrays.asList(subDir);
-                        Collections.sort(subLogFiles, new Comparator<File>() {
-                            @Override
-                            public int compare(File o1, File o2) {
-                                return (int) (o2.lastModified() - o1.lastModified());
-                            }
-                        });
-                        int index = 0;
-                        for (; index < subLogFiles.size(); index++) {
-                            if (index >= keepNum) break;
-                        }
-                        for (; index < subLogFiles.size(); index++) {
-                            String fileName = subLogFiles.get(index).getName();
-                            if (fileName.endsWith(".qdb") || fileName.endsWith(".xml"))
-                                continue;
-                            subLogFiles.get(index).delete();
-                        }
-                    }
-                }
-            }
-
-            private boolean ensureTransferValidFileToGZip(ZipOutputStream zipOs, File logFile, String entryParentName, String folderNameByDate) throws IOException {
-                boolean hasLogFile = false;
-                if (null != logFile && logFile.exists()) {
-                    if (logFile.isFile() && 0 < logFile.length()) {
-                        FileUtil.transferFileToGZip(zipOs, logFile.getAbsolutePath(), entryParentName);
-                        hasLogFile = true;
-                    } else if (logFile.isDirectory()) {
-                        File[] logFiles = logFile.listFiles();
-                        if (null != logFiles && 0 < logFiles.length) {
-                            for (File targetFile : logFiles) {
-                                boolean result;
-                                if (logFile.getName().equals(folderNameByDate)) { //如果文件夹名字 是日期 就不当成entryParentName
-                                    result = ensureTransferValidFileToGZip(zipOs, targetFile, null, null);
-                                } else {
-                                    result = ensureTransferValidFileToGZip(zipOs, targetFile,
-                                            (null == entryParentName ? "" : (entryParentName + File.separator)) + logFile.getName(), null);
-                                }
-                                hasLogFile = result ? result : hasLogFile;
-                            }
-                        }
-                    }
-                }
-                return hasLogFile;
-            }
-
-            private void transferFileToGZip(ZipOutputStream zipOs, String reportFilePath, String entryParentName) throws IOException {
-                InputStream is = null;
-                int length;
-                try {
-                    ZipEntry entry;
-                    if (TextUtils.isEmpty(entryParentName)) {
-                        entry = new ZipEntry(new File(reportFilePath).getName());
-                    } else {
-                        entry = new ZipEntry(entryParentName + File.separator + new File(reportFilePath).getName());
-                    }
-                    zipOs.putNextEntry(entry);
-                    is = new BufferedInputStream(new FileInputStream(reportFilePath));
-                    while (-1 != (length = is.read(zipDataBuffer))) {
-                        zipOs.write(zipDataBuffer, 0, length);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (null != is) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    zipOs.flush();
-//                    zipOs.closeEntry();
-                }
             }
 
             @Override
@@ -379,13 +264,12 @@ public class CompressAppendixService extends Service {
                         } else {
 
                             //判断移动网,并弹框提示用户
-                            if (NetUtil.isNetworkTypeWifi(getContext())) {
-//                            if (NetUtil.isMobile(getContext())) {
+//                            if (NetUtil.isNetworkTypeWifi(getContext())) {
+                            if (NetUtil.isMobile(getContext())) {
                                 showMobileNetUploadDialog(zipAllFile, extras);
                                 return;
 
                             }
-
 
                             if (mUploadListener != null) {
                                 mUploadListener.sendMsg(ApiConstants.OTHER_CODE, "压缩完成,存放至sdcard/yota_log/UploadFile,即将上传到服务器");
@@ -399,6 +283,7 @@ public class CompressAppendixService extends Service {
                     Toast.makeText(CompressAppendixService.this, getString(R.string.compress_file_failed), Toast.LENGTH_SHORT).show();
                 }
             }
+
         }.execute();
 
     }
@@ -430,6 +315,7 @@ public class CompressAppendixService extends Service {
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         if (mUploadListener != null) {
                             mUploadListener.sendMsg(ApiConstants.User_Cancel_Upload, "当前处于数据网络,用户取消上传");
+                            zipAllFile.delete();
                         }
 
                     }

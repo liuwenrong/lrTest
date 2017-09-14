@@ -66,7 +66,7 @@ public class ManageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             mHolder.tvTime.setText("最后修改时间:" + data.getFileTime());
             mHolder.tvFileSize.setText(data.getFileSize());
             mHolder.imgHeader.setImageResource(data.isFold() ? R.mipmap.ic_folder_open_black_36dp :
-                    R.mipmap.ic_folder_open_black_36dp);
+                    R.drawable.ic_file_black_36dp);
             mHolder.checkBoxFile.setChecked(data.isSelected());
 
             mHolder.checkBoxFile.setTag(data);

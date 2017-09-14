@@ -109,7 +109,7 @@
     <string name="home_tab_name">首页</string>
     <string name="config_tab_name">配置</string>
     <string name="manage_tab_name">管理</string>
-    <string name="monitor_tab_name">监控</string>
+    <string name="monitor_tab_name">监听</string>
     <string name="setting">设置</string>
     <string name="select_all">全选</string>
     <string name="switch_config">切换配置界面</string>

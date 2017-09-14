@@ -67,7 +67,7 @@ public class MonitorAct extends BaseActivity {
         }
 
         new MaterialDialog.Builder(this)
-                .title("上传Log日志")
+                .title("离线日志")
                 .content(typeStrIds[type], false)
                 .positiveText("确定")
                 .negativeText("取消")

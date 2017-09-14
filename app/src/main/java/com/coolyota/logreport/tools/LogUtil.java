@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import static android.content.Context.ALARM_SERVICE;
+import static java.lang.Runtime.getRuntime;
 
 /**
  * des: log工具,状态信息存至SD卡
@@ -68,16 +69,21 @@ public class LogUtil {
     /**
      * 文件夹名称 /tombstones
      */
-    public static String mTombstonesFolder = File.separator + "statusinfo" +  File.separator + "tombstones";
+    public static String mTombstonesFolder = File.separator + "statusinfo" + File.separator + "tombstones";
     /**
      * 文件夹名称 /anr
      */
-    public static String mAnrFolder = File.separator + "statusinfo" +  File.separator + "anr";
+    public static String mAnrFolder = File.separator + "statusinfo" + File.separator + "anr";
     /**
      * 文件夹名称 /pstore
      */
     public static String mPstoreFolder = File.separator + "pstore";
     public static List<Process> mProcesses;
+    public static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+    /**
+     * 绝对路径 mnt/../ @link(FOLDER_NAME)
+     */
+    public static String mLogAbsPathByDate;
     static Context context;
     private static String LOG_PATH_MEMORY_DIR;     //日志文件在内存中的路径(日志文件在安装目录中的路径) 内部存储
     /**
@@ -88,7 +94,6 @@ public class LogUtil {
     private static String LOG_SERVICE_LOG_PATH;    //本服务产生的日志，记录日志服务开启失败信息
     private static String logServiceLogName = "Log.txt";//本服务输出的日志文件名称
     private static OutputStreamWriter writer;
-    public static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
     private static int CURR_LOG_TYPE = SDCARD_TYPE;    //当前的日志记录类型
     private static String CURR_INSTALL_LOG_NAME;   //如果当前的日志写在内存中，记录当前的日志文件名称
     private static String FILE_FORMAT = ".txt"; //文件格式,后缀名
@@ -103,26 +108,8 @@ public class LogUtil {
      * 文件目录名称 /log_时间 -- > "" 空字符
      */
     private static String mLogPathByDate;
-    /**
-     * 绝对路径 mnt/../ @link(FOLDER_NAME)
-     */
-    public static String mLogAbsPathByDate;
-    private static String[] mFolders = new String[]{/*mAppsFolder, mKernelFolder,*/ mStatusInfoFolder, /*mNetLogFolder,*/ mAnrFolder, mDropboxFolder, mTombstonesFolder, /*mPstoreFolder*/};
-
-    public void init(Context context) {
-        init();
-    }
-
-    private void init() {
-        LOG_PATH_MEMORY_DIR = CYLogReporterApplication.getInstance().getFilesDir().getAbsolutePath() + File.separator + "log";
-        LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
-
-        getLogAbsPathByDate();
-
-        setContext(CYLogReporterApplication.getInstance());
-        register();
-        deploySwitchLogFileTask();
-    }
+    private static String[] mFolders = new String[]{mAppsFolder, /*mKernelFolder,*/ mStatusInfoFolder, /*mNetLogFolder,*/ mAnrFolder, mDropboxFolder, mTombstonesFolder, /*mPstoreFolder*/};
+    private static LogUtil mLogUtil;
 
     public LogUtil(Context ctx) {
         init(ctx);
@@ -131,8 +118,6 @@ public class LogUtil {
     private LogUtil() {
         init();
     }
-
-    private static LogUtil mLogUtil;
 
     public static LogUtil getInstance() {
         if (mLogUtil == null) {
@@ -145,84 +130,14 @@ public class LogUtil {
         return mLogUtil;
     }
 
-    public void startLog() {
-        new LogCollectorThread().start();
-    }
-
-    /**
-     * 开始收集日志信息
-     */
-    public void createLogCollector() {
-
-        mProcesses = new ArrayList<>();
-
-        FileOutputStream out = null;
-        try {
-
-            copyTombstonesToSdcard();
-            copyPstoreToSdcard();
-            copyDropboxToSdcard();
-
-            collectorStatusInfo();
-
-        } catch (Exception e) {
-            recordLogServiceLog("CollectorThread == >" + e.getMessage());
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-
-    public void collectorStatusInfo() {
-
-        new Thread() {
-
-            @Override
-            public void run() {
-                super.run();
-
-                try {
-                    String pkgListFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "packageslist" + FILE_FORMAT;
-                    String pkgListCommand = "pm list packages";
-                    String meminfoFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "meminfo1" + FILE_FORMAT;
-                    String meminfoCommand = "dumpsys meminfo -a";
-                    String propertyFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "property" + FILE_FORMAT;
-                    String propertyCommand = "getprop";
-                    Process pkgListPro = Runtime.getRuntime().exec(pkgListCommand);
-                    writeToFile(new File(pkgListFileName), pkgListPro.getInputStream());
-
-                    Process propertyPro = Runtime.getRuntime().exec(propertyCommand);
-                    writeToFile(new File(propertyFileName), propertyPro.getInputStream());
-
-                    Process meminfoPro = Runtime.getRuntime().exec(meminfoCommand);  //会卡住进程,最好放最后或者子线程
-                    writeToFile(new File(meminfoFileName), meminfoPro.getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                }
-
-            }
-        }.start();
-    }
-
-
-
     /**
      * 创建日志目录
      */
-    private static void createLogDir() {
+    private static void createAllLogDir() {
         mLogPathByDate = "" /*+ File.separator + "log_" + myLogSdf.format(new Date())*/;
         boolean mkOk;
 
-        if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 
             for (int i = 0; i < mFolders.length; i++) {
                 String absPath = LOG_PATH_SDCARD_DIR + mLogPathByDate + mFolders[i];
@@ -236,6 +151,22 @@ public class LogUtil {
             }
         }
     }
+
+    /**
+     * 创建目录,
+     * @param dir 目录名如:apps status
+     */
+    private static void createDir(String dir) {
+
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            String absPath = LOG_PATH_SDCARD_DIR + mLogPathByDate + dir;
+            File file = new File(absPath);
+            if (!file.isDirectory()) {
+                file.mkdirs();
+            }
+        }
+    }
+
 
     public static void stopLog() {
 
@@ -274,7 +205,7 @@ public class LogUtil {
      * @return sdcard/0CYLogReport/log_时间
      */
     public static String getLogAbsPathByDate() {
-        createLogDir();
+        createAllLogDir();
         CURR_INSTALL_LOG_NAME = null;
         mLogAbsPathByDate = LOG_PATH_SDCARD_DIR + mLogPathByDate;
         return mLogAbsPathByDate;
@@ -285,23 +216,6 @@ public class LogUtil {
         IntentFilter logTaskFilter = new IntentFilter();
         logTaskFilter.addAction(MONITOR_LOG_SIZE_ACTION);
         logTaskFilter.addAction(SWITCH_LOG_FILE_ACTION);
-    }
-
-    /**
-     * 检查日志文件大小是否超过了规定大小
-     * 如果超过了重新开启一个日志收集进程
-     */
-    private void checkLogSize() {
-        if (CURR_INSTALL_LOG_NAME != null && !"".equals(CURR_INSTALL_LOG_NAME)) {
-            String path = LOG_PATH_MEMORY_DIR + File.separator + CURR_INSTALL_LOG_NAME;
-            File file = new File(path);
-            if (!file.exists()) {
-                return;
-            }
-            if (file.length() >= MEMORY_LOG_FILE_MAX_SIZE) {
-                new LogCollectorThread().start();
-            }
-        }
     }
 
     /**
@@ -420,7 +334,7 @@ public class LogUtil {
         List<String> orgProcList = new ArrayList<String>();
         Process proc = null;
         try {
-            proc = Runtime.getRuntime().exec("ps");
+            proc = getRuntime().exec("ps");
             StreamConsumer errorConsumer = new StreamConsumer(proc
                     .getErrorStream());
 
@@ -483,6 +397,7 @@ public class LogUtil {
         File dir = new File(LOG_PATH_SDCARD_DIR);
         deleteDirWithFile(dir);
     }
+
     public static void deleteDirWithFile(File dir) {
         if (dir == null || !dir.exists() || !dir.isDirectory())
             return;
@@ -494,6 +409,7 @@ public class LogUtil {
         }
         dir.delete();// 删除目录本身
     }
+
     /**
      * 每次记录日志之前先清除日志的缓存, 不然会在两个日志文件中记录重复的日志
      * 可以在关闭 获取日志时清除,这样下次就不会重复了
@@ -504,7 +420,7 @@ public class LogUtil {
         commandList.add("logcat");
         commandList.add("-c");
         try {
-            proc = Runtime.getRuntime().exec(
+            proc = getRuntime().exec(
                     commandList.toArray(new String[commandList.size()]));
             StreamConsumer errorGobbler = new StreamConsumer(proc
                     .getErrorStream());
@@ -659,7 +575,7 @@ public class LogUtil {
      */
     private static void ensureAllReadWrite(File logDir) {
         try {
-            Process process = Runtime.getRuntime().exec("chmod a+rw -R " + logDir.getAbsolutePath());
+            Process process = getRuntime().exec("chmod a+rw -R " + logDir.getAbsolutePath());
             Thread.currentThread().sleep(500);
             process.destroy();
         } catch (InterruptedException e) {
@@ -718,6 +634,7 @@ public class LogUtil {
         }
 
     }
+
     /**
      * 将文件夹中文件全部拷贝到另一个文件夹中
      *
@@ -744,6 +661,193 @@ public class LogUtil {
             }
         }
         return hasLogFile;
+    }
+
+    public static void saveInfoToFile(String type, String msg, Context context) {
+        try {
+            String filePath = context.getCacheDir().getAbsolutePath() + type;
+            SaveInfo saveInfo = new SaveInfo(msg, type, filePath, context);
+            saveInfo.run();
+        } catch (Exception e) {
+            CYLog.e(TAG, e);
+        }
+
+    }
+
+    public void init(Context context) {
+        init();
+    }
+
+    private void init() {
+        LOG_PATH_MEMORY_DIR = CYLogReporterApplication.getInstance().getFilesDir().getAbsolutePath() + File.separator + "log";
+        LOG_PATH_SDCARD_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FOLDER_NAME;
+
+        getLogAbsPathByDate();
+
+        setContext(CYLogReporterApplication.getInstance());
+        register();
+        deploySwitchLogFileTask();
+    }
+
+    public void startLog() {
+        new LogCollectorThread().start();
+    }
+
+    /**
+     * 开始收集日志信息
+     */
+    public void createLogCollector() {
+
+        mProcesses = new ArrayList<>();
+
+        FileOutputStream out = null;
+        try {
+
+            copyTombstonesToSdcard();
+            copyPstoreToSdcard();
+            copyDropboxToSdcard();
+
+            collectorStatusInfo();
+
+        } catch (Exception e) {
+            recordLogServiceLog("CollectorThread == >" + e.getMessage());
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void collectorStatusInfo() {
+
+        new Thread() {
+
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+                    createDir(mStatusInfoFolder);
+                    String pkgListFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "packageslist" + FILE_FORMAT;
+                    String pkgListCommand = "pm list packages";
+                    String meminfoFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "meminfo1" + FILE_FORMAT;
+                    String meminfoCommand = "dumpsys meminfo -a";
+                    String propertyFileName = mLogAbsPathByDate + mStatusInfoFolder + File.separator + "property" + FILE_FORMAT;
+                    String propertyCommand = "getprop";
+                    Process pkgListPro = getRuntime().exec(pkgListCommand);
+                    writeToFile(new File(pkgListFileName), pkgListPro.getInputStream());
+
+                    Process propertyPro = getRuntime().exec(propertyCommand);
+                    writeToFile(new File(propertyFileName), propertyPro.getInputStream());
+
+                    Process meminfoPro = getRuntime().exec(meminfoCommand);  //会卡住进程,最好放最后或者子线程
+                    writeToFile(new File(meminfoFileName), meminfoPro.getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                }
+
+            }
+        }.start();
+    }
+
+    /**
+     * 收集logcat日志, 该进程不会自动停止, 需加上 -d
+     */
+    public void collectLogcat() {
+
+        new Thread() {
+
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+
+                    createDir(mAppsFolder); //确保目录存在,防止不能写入文件
+                    String mainLogFileName = mLogAbsPathByDate + mAppsFolder + File.separator + "android" + FILE_FORMAT;
+                    String mainLogCommand = "logcat -d -f " + mainLogFileName;
+                    String radioLogFileName = mLogAbsPathByDate + mAppsFolder + File.separator + "radio" + FILE_FORMAT;
+                    String radioLogCommand = "logcat -d -b radio -f " + radioLogFileName;
+                    String eventsFileName = mLogAbsPathByDate + mAppsFolder + File.separator + "events" + FILE_FORMAT;
+                    String eventsLogCommand = "logcat -d -b events -f " + eventsFileName;
+
+                    Runtime.getRuntime().exec(mainLogCommand);
+                    Runtime.getRuntime().exec(eventsLogCommand);
+                    Runtime.getRuntime().exec(radioLogCommand);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                }
+
+            }
+        }.start();
+    }
+
+    /**
+     * 检查日志文件大小是否超过了规定大小
+     * 如果超过了重新开启一个日志收集进程
+     */
+    private void checkLogSize() {
+        if (CURR_INSTALL_LOG_NAME != null && !"".equals(CURR_INSTALL_LOG_NAME)) {
+            String path = LOG_PATH_MEMORY_DIR + File.separator + CURR_INSTALL_LOG_NAME;
+            File file = new File(path);
+            if (!file.exists()) {
+                return;
+            }
+            if (file.length() >= MEMORY_LOG_FILE_MAX_SIZE) {
+                new LogCollectorThread().start();
+            }
+        }
+    }
+
+    static class ProcessInfo {
+        public String user;
+        public String pid;
+        public String ppid;
+        public String name;
+
+        @Override
+        public String toString() {
+            String str = "user=" + user + " pid=" + pid + " ppid=" + ppid
+                    + " name=" + name;
+            return str;
+        }
+    }
+
+    static class StreamConsumer extends Thread {
+        InputStream is;
+        List<String> list;
+
+        StreamConsumer(InputStream is) {
+            this.is = is;
+        }
+
+        StreamConsumer(InputStream is, List<String> list) {
+            this.is = is;
+            this.list = list;
+        }
+
+        public void run() {
+            try {
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+
+                String line = null;
+                while ((line = br.readLine()) != null  /*&& line.contains(getContext().getPackageName())*/) {
+                    if (list != null) {
+                        list.add(line);
+                    }
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -796,61 +900,6 @@ public class LogUtil {
                 recordLogServiceLog(Log.getStackTraceString(e));
             }
         }
-    }
-
-    static class ProcessInfo {
-        public String user;
-        public String pid;
-        public String ppid;
-        public String name;
-
-        @Override
-        public String toString() {
-            String str = "user=" + user + " pid=" + pid + " ppid=" + ppid
-                    + " name=" + name;
-            return str;
-        }
-    }
-
-    static class StreamConsumer extends Thread {
-        InputStream is;
-        List<String> list;
-
-        StreamConsumer(InputStream is) {
-            this.is = is;
-        }
-
-        StreamConsumer(InputStream is, List<String> list) {
-            this.is = is;
-            this.list = list;
-        }
-
-        public void run() {
-            try {
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
-
-                String line = null;
-                while ((line = br.readLine()) != null  /*&& line.contains(getContext().getPackageName())*/) {
-                    if (list != null) {
-                        list.add(line);
-                    }
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-    }
-
-    public static void saveInfoToFile(String type, String msg, Context context) {
-        try {
-            String filePath = context.getCacheDir().getAbsolutePath() + type;
-            SaveInfo saveInfo = new SaveInfo(msg, type, filePath, context);
-            saveInfo.run();
-        } catch (Exception e) {
-            CYLog.e(TAG, e);
-        }
-
     }
 
 }

@@ -43,23 +43,6 @@ public class ConfigFragment extends BaseFragment {
     public SwitchButton mSbRadio;
     public SwitchButton mSbEvents;
     public SwitchButton mSbKernel;
-
-    public CompoundButton.OnCheckedChangeListener mDumpOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
-
-            if (buttonView == mSbRamDumps) {
-                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_ENABLE_RAMDUMPS, isChecked ? "1" : "0");
-            } else if (buttonView == mSbRestartLevel) {
-                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_RESTART_LEVEL, isChecked ? "ALL_DISABLE" : "ALL_ENABLE");
-            } else if (buttonView == mSbDownloadMode) {
-                SystemProperties.set(CYConstants.PERSIST_SYS_DOWNLOAD_MODE, isChecked ? "1" : "0");
-            }
-
-
-        }
-    };
-
     public CompoundButton.OnCheckedChangeListener mAndroidOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -82,6 +65,29 @@ public class ConfigFragment extends BaseFragment {
     public SwitchButton mSbRamDumps;
     public SwitchButton mSbRestartLevel;
     public SwitchButton mSbDownloadMode;
+    public CompoundButton.OnCheckedChangeListener mDumpOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+
+            if (buttonView == mSbRamDumps) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_ENABLE_RAMDUMPS, isChecked ? "1" : "0");
+            } else if (buttonView == mSbRestartLevel) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_SSR_RESTART_LEVEL, isChecked ? "ALL_DISABLE" : "ALL_ENABLE");
+            } else if (buttonView == mSbDownloadMode) {
+                SystemProperties.set(CYConstants.PERSIST_SYS_DOWNLOAD_MODE, isChecked ? "1" : "0");
+            }
+
+            buttonView.setEnabled(false);
+            buttonView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    buttonView.setEnabled(true);
+                }
+            }, 1000);
+
+
+        }
+    };
     String[] mTypes = {Type_Modem, Type_GPS, Type_WLAN, Type_AUDIO, Type_SENSOR};
     SwitchButton[] mQxdmBtns = new SwitchButton[5];
     public CompoundButton.OnCheckedChangeListener mQxdmOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
